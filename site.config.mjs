@@ -1,6 +1,6 @@
 // Site-wide settings. Everything a launch decision changes lives here.
 // BASE_URL can be overridden at build time: BASE_URL=https://thealmanac.ie/ npm run build
-const customDomain = null;                  // 'thealmanac.ie' once the domain is live: writes dist/CNAME and becomes the base URL
+const customDomain = 'thealmanac.ie';                 // 'thealmanac.ie' once the domain is live: writes dist/CNAME and becomes the base URL
 
 export default {
   brand: 'The Almanac',
