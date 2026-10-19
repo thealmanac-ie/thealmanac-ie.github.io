@@ -1,0 +1,13 @@
+# dependencies and build output
+node_modules/
+dist/
+# scratch, caches, test output
+tmp/
+shots/
+*.log
+# private scrub list: never published
+.scrub.local.json
+# editors and OS
+.DS_Store
+.vscode/
+.idea/

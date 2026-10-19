@@ -1,0 +1,40 @@
+{
+ "about": "Hand-set parameters for the Point, Westport Quay. Heights in metres above OD Malin. Sources for every number are in README.md and in the page section 'How deep is it at the steps, really?'.",
+ "spot": {
+  "lat": 53.80237,
+  "lon": -9.56025,
+  "source": "OSM node 9996872068 (leisure=swimming_area, name=The Point)"
+ },
+ "top": 2.9,
+ "top_note": "Ground at the top of the slope at the swimming area in the OPW 2011 LiDAR DTM: 2.8-3.0 m OD Malin (tools/analyse_seabed.mjs). The promenade was built later; its exact level is not in any document we found.",
+ "steps": {
+  "count": 10,
+  "bottom": 0.9,
+  "tread": 0.3,
+  "start_x": 1.5,
+  "note": "Drawn evenly between the promenade and the foreshore; the real number and height of the steps are not in any document we found."
+ },
+ "bed": {
+  "best": 0.9,
+  "lo": 0.6,
+  "hi": 1.1,
+  "slope": 0.008,
+  "note": "Foreshore at the foot of the revetment in the OPW 2011 LiDAR: 0.8-0.95 m OD Malin at the swimming area node, a shelf of 0.6-0.9 m for ~30 m south. Survey stated RMS within +/-0.2 m; it predates the steps."
+ },
+ "flats_odm": 0.9,
+ "msl_odm": 0.06,
+ "msl_note": "Mean sea level relative to OD Malin at the Marine Institute gauges either side of Clew Bay: Galway +0.029, Inishmore +0.045, Ballyglass +0.066, Sligo +0.081 (data.gov.ie gauge metadata). Roonagh's own figure (+0.376) is an outlier and is not used.",
+ "diffs": {
+  "hw_spring_min": 30,
+  "hw_neap_min": 30,
+  "lw_spring_min": 45,
+  "lw_neap_min": 45,
+  "mhws": 0.1,
+  "mhwn": 0.0,
+  "mlwn": 0.0,
+  "mlws": -0.1,
+  "note": "Point minus Roonagh. Times: Inishgort is +22 min (HW) and +34 min (LW) after Roonah Quay in UKHO EasyTide; the 1868 Admiralty directions put Westport HW 19 min after Clare Island; the Point is further in than Inishgort, so we add a little. Heights: the 1868 Admiralty figures give Westport springs 0.5 ft (0.15 m) bigger than Clare Island and neaps the same."
+ },
+ "bay_bed_odm": -1.1,
+ "bay_bed_note": "Only for the picture: the level at which the hero shows the bay as drained, from the Admiralty chart's 1.4 m drying height just west of the Point (MWP 2017), about -1.1 m OD Malin."
+}

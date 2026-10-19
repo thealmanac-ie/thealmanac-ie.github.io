@@ -1,0 +1,81 @@
+{
+  "about": "Croagh Patrick (Cruach Phádraig, the Reek), Co. Mayo: is the summit in cloud, the forecast for the top and the view from it. Template: mountain (the Reek lab app). The summit, viewpoint and forecast points below are injected into the app; its data/ files (skyline, panorama, viewshed) are computed for this summit by the lab's tools.",
+  "slug": "croagh-patrick",
+  "template": "mountain",
+  "app": "reek",
+  "name": "Croagh Patrick",
+  "nameGa": "Cruach Phádraig",
+  "shortName": "the Reek",
+  "area": "County Mayo",
+  "listing": {
+    "group": "Mayo",
+    "title": "Croagh Patrick",
+    "blurb": "Is the top of the Reek in cloud? A live verdict from three weather models, the next clear spell, and the real view from the summit.",
+    "order": 2
+  },
+  "seo": {
+    "title": "Can I see Croagh Patrick today? Summit cloud and the view from the top",
+    "h1": "Can I see the Reek today?",
+    "description": "Is the top of Croagh Patrick (Cruach Phádraig, 764 m) in cloud? A live verdict from three weather models, the next clear spell, and the real view from the summit.",
+    "runtimeTitle": "can I see Croagh Patrick today?"
+  },
+  "summit": {
+    "lat": 53.76,
+    "lon": -9.6601,
+    "height": 764
+  },
+  "foot": {
+    "name": "Murrisk",
+    "lat": 53.779,
+    "lon": -9.6354
+  },
+  "viewpoint": {
+    "name": "Westport Quay",
+    "lat": 53.7979,
+    "lon": -9.5505
+  },
+  "glow": {
+    "west": {
+      "lat": 53.7,
+      "lon": -11.2
+    },
+    "east": {
+      "lat": 53.8,
+      "lon": -8.1
+    }
+  },
+  "card": {
+    "query": "?hour=15",
+    "title": "Can I see the Reek today?",
+    "subtitle": "Croagh Patrick's summit, live from three weather models"
+  },
+  "jsonld": {
+    "@type": "Mountain",
+    "name": "Croagh Patrick",
+    "alternateName": [
+      "Cruach Phádraig",
+      "The Reek"
+    ],
+    "address": {
+      "@type": "PostalAddress",
+      "addressRegion": "County Mayo",
+      "addressCountry": "IE"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 53.76,
+      "longitude": -9.6601,
+      "elevation": 764
+    }
+  },
+  "attribution": [
+    "open-meteo",
+    "eudem",
+    "osm",
+    "openfreemap",
+    "logainm"
+  ],
+  "related": [
+    "westport"
+  ]
+}

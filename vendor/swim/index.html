@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en-IE">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Point, Westport Quay: how deep is it at the steps?</title>
+<meta name="description" content="The tide at the swimming steps at the Point, Westport Quay: how deep it is now, when it is deep enough to swim, chop, water temperature, and how all of it is worked out.">
+<meta name="theme-color" content="#0b1622">
+<link rel="stylesheet" href="css/swim.css">
+</head>
+<body>
+<header class="hero" id="hero" data-tone="dark">
+  <canvas id="heroCanvas" aria-hidden="true"></canvas>
+  <div class="heroActions"><button id="shareBtn" aria-label="Make a picture of this swim to share">Share</button><button id="inBtn" class="in" aria-label="Log a dip now">I'm in</button></div>
+  <div class="top">
+    <div class="place">The Point · Westport Quay</div>
+    <div class="when" id="when">&nbsp;</div>
+    <div class="verdict" aria-live="polite">
+      <div class="big" id="verdict">…</div>
+      <div class="line" id="verdictLine"></div>
+      <div class="next" id="nextSwim"></div>
+      <div class="corrected" id="correctedNote"></div>
+    </div>
+  </div>
+  <div class="gaugeLabel" id="gaugeLabel"></div>
+  <div class="scrub">
+    <div class="future" id="future" role="group" aria-label="Sea level: now or in the future">
+      <span class="lab">Sea level</span>
+      <button data-year="now" aria-pressed="true">today</button><button data-year="2050" aria-pressed="false">2050</button><button data-year="2100" aria-pressed="false">2100</button>
+      <span class="scen" id="scenBtns" hidden><button data-scen="ssp126" aria-pressed="true">low emissions</button> <button data-scen="ssp585" aria-pressed="false">high</button></span>
+    </div>
+    <p class="futureNote" id="futureNote"></p>
+    <div class="ticks" id="ticks"></div>
+    <div class="row">
+      <output id="scrubOut" class="num">now</output>
+      <input id="scrub" type="range" min="0" max="1440" step="5" value="0" aria-label="Move through the next 24 hours">
+      <button id="nowBtn" hidden>Now</button>
+    </div>
+    <div class="hint">Drag to any time in the next 24 hours. Depth is at the foot of the steps.</div>
+  </div>
+</header>
+
+<main>
+<section id="today">
+  <p class="kicker">Today and the next three days</p>
+  <h2>When is there water at the steps?</h2>
+  <p class="lede">Westport Bay is shallow and the shelf in front of the Point dries for most of every tide, so the question is never <em>if</em> but <em>when</em>. Pick what you're after:</p>
+  <div class="pick" role="group" aria-label="How much water do you want?">
+    <button data-level="wade"><span class="sw"></span>Wade <span class="need small"></span></button>
+    <button data-level="dip"><span class="sw"></span>Dip <span class="need small"></span></button>
+    <button data-level="swim"><span class="sw"></span>Swim <span class="need small"></span></button>
+  </div>
+  <div class="days" id="dayTabs"></div>
+  <div class="chartWrap">
+    <svg id="dayChart" role="img" aria-label="Depth at the foot of the steps through the day"></svg>
+    <div class="readout" id="readout"></div>
+  </div>
+  <p class="small">Depth of water at the foot of the steps, from midnight to midnight. Shaded: the times there is at least the depth you picked. Grey bands: night. Tap or drag the chart for any time.</p>
+  <h3>The next four days</h3>
+  <ul class="windows" id="winList"></ul>
+  <p class="note"><b>What the words mean.</b> Depth of water at the foot of the steps, set against someone 1.72 m tall using standard body proportions<a class="cite" href="#s-body">B</a>. <b>Wade</b>: 0.3 m or more, up the shins. <b>Dip</b>: 0.7 m or more, thigh-deep; sit down and you're in to the shoulders. <b>Swim</b>: 1 m or more, hip-deep and up, enough for breaststroke with your knees clear of the stones. These are our rules of thumb, not anyone's regulations. Further out from the steps the shelf is a little lower, so there is a bit more water than this.</p>
+  <h3>Finding the steps</h3>
+  <figure class="fig"><div class="mapWrap" id="mapWrap"><img id="mapImg" src="data/map.png" alt="Map of the Point and Roman Island from the 2011 LiDAR survey" width="440" height="330"><svg id="mapSvg" viewBox="0 0 440 330" aria-hidden="true"></svg></div>
+  <figcaption>The west tip of Roman Island, drawn from the 2011 LiDAR survey<a class="cite" href="#s-opw">opw</a> with OpenStreetMap roads<a class="cite" href="#s-osm">osm</a>. Pale green: the made ground of the island and the Quay. Sand colours: shore that the tide covers. Blue: under water when the survey was flown. The red dot is the swimming spot. North is up; the bar is 100 m.</figcaption></figure>
+  <p>Follow the Quay west past the pet-food factory to the free car park at the very tip of Roman Island<a class="cite" href="#s-osm">osm</a>. The steps, the shelters and the cold shower are on the south-west side, facing the Reek. Coordinates: 53.8024 N, 9.5603 W.</p>
+  <div class="safety"><b>The small print, once.</b> These are predictions and estimates, not measurements. There's no lifeguard at the Point<a class="cite" href="#s-lifeguards">lifeguards</a>. A strong south-westerly or a deep low can lift the tide by a few tens of centimetres above the prediction, and high pressure can hold it down; the bed moves after storms. Have a look before you go in, and watch for a "Do Not Swim" notice from the Council (it has happened here, see below).</div>
+</section>
+
+<section id="conditions">
+  <p class="kicker">Right now</p>
+  <h2>What it's like down there</h2>
+  <div class="cards">
+    <div class="card"><div class="k">Water</div><div class="v num" id="cSea">–</div><div class="s" id="cSeaS">Loading…</div></div>
+    <div class="card"><div class="k">Air</div><div class="v num" id="cAir">–</div><div class="s" id="cAirS">Loading…</div></div>
+    <div class="card"><div class="k">Wind</div><div class="v num" id="cWind">–</div><div class="s" id="cWindS">Loading…</div></div>
+    <div class="card"><div class="k">Chop at the steps</div><div class="v" id="cChop">–</div><div class="s" id="cChopS">Loading…</div></div>
+    <div class="card"><div class="k">Daylight</div><div class="v num" id="cLight">–</div><div class="s" id="cLightS"></div></div>
+    <div class="card"><div class="k">Tide range today</div><div class="v num" id="cRange">–</div><div class="s" id="cRangeS"></div></div>
+  </div>
+  <p class="small">Wind and air: Open-Meteo forecast for the Point. Water: the Marine Institute's ocean model, or Météo-France's if that fails. Chop is our own estimate from the wind and the stretch of open water upwind of the steps (how, below). All of it is a forecast for open water, not a reading at the steps.</p>
+</section>
+
+<section id="dips">
+  <p class="kicker">Yours, on this phone</p>
+  <h2>Your dips</h2>
+  <p>Tap <b>I'm in</b> at the top when you're in the water. The page notes the time and its own numbers for that moment: the tide, the depth at the steps, the water temperature, the wind and the chop. If you tell it where the water was on the steps, that sighting also checks the prediction. Everything stays in this browser. Nothing is posted anywhere.</p>
+  <div class="stats" id="dipStats"></div>
+  <div class="cal"><svg id="dipCal" role="img" aria-label="Calendar of this year's dips, coloured by water temperature"></svg>
+    <div class="legend"><span>5°</span><span class="bar" id="calLegend"></span><span>18°</span><span>water temperature on the day</span></div></div>
+  <ul class="dipList" id="dipList"></ul>
+  <div class="calib" id="calib"></div>
+  <div class="filebtns"><button class="btn ghost" id="exportBtn">Export my log (.json)</button><label class="btn ghost" for="importFile">Import a log file</label><input type="file" id="importFile" accept="application/json,.json"></div>
+  <p class="small">To pool sightings with the group, export your log and send the file to whoever is collecting them, by WhatsApp or email. They import it here, and it merges with their own log, skipping duplicates. There's no server; the file is the only copy that leaves your phone, and only if you send it.</p>
+</section>
+
+<section id="springs">
+  <p class="kicker">The fortnightly rhythm</p>
+  <h2>Springs and neaps</h2>
+  <p>Twice a month the tides get big (springs) and in between they go slack (neaps). Springs come when the sun and moon pull in line, at new and full moon; neaps come with the half moons<a class="cite" href="#s-noaa">27</a>. On this coast the biggest tides arrive about a day and a half after the moon, a lag called the age of the tide (we get <span id="nAge">33</span> hours from the Roonagh constants). At the Point that fortnightly swing decides everything: at springs the high water gives you a proper swim off the steps; at neaps it barely reaches them.</p>
+  <div class="fig strip"><svg id="stripChart" role="img" aria-label="Daily tide range at the Point over a month, with new and full moons"></svg>
+    <figcaption>How deep the day's highest tide gets at the foot of the steps, from a week ago to three weeks ahead. Dashed lines: wade, dip and swim. Circles: new moon (dark) and full moon (pale). Red: today.</figcaption></div>
+  <p id="stripText"></p>
+  <h3>Why the Point is a dawn and dusk swim</h3>
+  <p>On this coast the big spring high waters always come early in the morning and again in the evening, and spring low water falls around the middle of the day. Springs follow new and full moon, when the moon crosses the sky in step with the sun, so they come round at the same clock times every fortnight. The old Admiralty name for it is the "establishment" of the port. At Westport, high water on the day of full and new moon came at 4 h 57 m<a class="cite" href="#s-hoskyn">hoskyn</a>: about five o'clock, morning and evening, by the sun. The biggest tides follow a day and a half later, an hour or so later in the day. A botanist on the Clare Island Survey put it plainly in 1912: "Low water at spring-tides is in the middle of the day"<a class="cite" href="#s-cotton">cotton</a>.</p>
+  <p id="yearText" class="small"></p>
+</section>
+
+<section id="table">
+  <p class="kicker">For the diary</p>
+  <h2>Tide times at the Point</h2>
+  <table class="tt" id="tideTable"><thead><tr><th>Day</th><th>High water<br><span class="small">depth at the steps</span></th><th>Low water</th></tr></thead><tbody></tbody></table>
+  <p class="small">Irish time. These are our estimates for the Point, about half an hour after Roonagh (see "From Roonagh to the Point"). "Dry" means low water leaves the foot of the steps out of the water.</p>
+</section>
+
+<section id="futureSec">
+  <p class="kicker">The same steps, later</p>
+  <h2>2050 and 2100</h2>
+  <p>Use the <b>2050</b> and <b>2100</b> buttons at the top to see the same tide on the same steps with the sea higher. The rise comes from the IPCC's Sixth Assessment Report, through NASA's Sea Level Projection Tool<a class="cite" href="#s-nasaslr">nasaslr</a><a class="cite" href="#s-ar6">ar6</a>. If you click on Westport, the tool gives you the 1° grid cell at 53° N, 10° W, about 94 km south-west of the Point. Its nearest tide gauges, Dublin and Malin Head, are much further away. The numbers include vertical land motion, which here is close to zero (the median is nil, and the likely range is within ±5 cm by 2100). We count the rise from today, 2026.</p>
+  <dl class="kv" id="slrTable"></dl>
+  <div class="fig futureChart"><svg id="futureChart" role="img" aria-label="Hours a year with a swim's worth of water at the steps, now and in 2050 and 2100"></svg>
+    <figcaption>Hours a year with a metre or more of water at the foot of the steps, from the same tides on a higher sea. Bars: the median projection. Whiskers: the IPCC's likely range (17th–83rd percentile). Averaged over one 18.6-year lunar cycle of tides.</figcaption></div>
+  <p id="futureText"></p>
+  <h3>The Quay in the flood maps</h3>
+  <p>The Office of Public Works maps how far the sea would reach the Quay in a 1-in-10 and a 1-in-200-year storm, today and with a metre more sea: see them on <a href="https://www.floodinfo.ie/map/floodmaps/" rel="noopener">floodinfo.ie</a><a class="cite" href="#s-cfram">cfram</a>.</p>
+  <!-- left empty and hidden on purpose: js/app.js still draws into #floodSvg, and the OPW layers (CC BY-NC-ND) are not published -->
+  <svg id="floodSvg" viewBox="0 0 440 330" style="display:none" aria-hidden="true"></svg>
+  <p>Those maps are about storms, not ordinary tides. The flood study for the Westport plan says tidal flooding "has only impacted the Westport Quay area". It names "Properties along Rossbeg, Harbour View and The Point" as prone to it, says flooding at the Quay "can be as frequent as 1 in 2 years", and gives the highest event on record as 2.75 m OD, on 15 December 2012<a class="cite" href="#s-jba">jba</a>. For planning, the OPW adds 0.5 m (mid-range) or 1.0 m (high-end) of sea level over a 100-year horizon<a class="cite" href="#s-jba">jba</a>. A 2019 planning file on Roman Island used a 1-in-200-year flood level of 3.61 m OD<a class="cite" href="#s-abp">abp</a>.</p>
+  <p class="note">What this leaves out: tides themselves change a little as the sea deepens; the bed at the steps will move; storms and surges come on top; and the steps may well be rebuilt long before 2100. These are the same tides on a higher sea, nothing more.</p>
+</section>
+
+<section id="deep">
+  <p class="kicker">For the regulars</p>
+  <h2>How it's worked out, and what we don't know</h2>
+  <p>Everything above is a sum: <b>water level minus the height of the seabed at the foot of the steps</b>. Both halves have to be on the same vertical datum, and neither is measured at the Point itself. Here is how each half is done, where it could be wrong, and how to tell us.</p>
+
+  <details id="dDepth"><summary>How deep is it at the steps, really?</summary><div id="dDepthBody">
+<p>We put both halves of the sum on <b>OD Malin</b>, the Irish land-survey datum: mean sea level at Malin Head, 1960–69<a class="cite" href="#s-odm">odm</a>. It is what the LiDAR uses, and it doesn't care about tides.</p>
+<h3>The seabed at the foot of the steps</h3>
+<p>The Office of Public Works flew the Westport shore with LiDAR in 2011 (Fugro, 2 m grid, stated accuracy within ±0.2 m)<a class="cite" href="#s-opw">opw</a>. At the swimming area the promenade sits at about <b>+<span id="nTop">3.0</span> m</b>. The slope drops about 2 m over 8–10 m to the foreshore, which is at <b>+0.8 to +0.95 m</b> at the swimming spot. A shelf of +0.6 to +0.9 m then runs out for some 30 m. LiDAR can't see through water, but when the plane went over, the sea was at about +0.15 m: all across that survey square, the measured ground stops at +0.1 to +0.2 m (our reading of the data). So the shelf was dry and got measured. Further out the bed falls away. The Admiralty chart marks a drying height of 1.4 m "just west of the Point of Roman Island", as quoted in the Council's 2017 slipway report<a class="cite" href="#s-mwp17">mwp17</a>. That is roughly −1.1 m OD Malin, if chart datum here lies about 2.6 m below mean sea level, which is the gap in the Admiralty's predictions for Inishgort<a class="cite" href="#s-easytide">easytide</a>.</p>
+<p>The page uses <b>+<span id="nBed">0.9</span> m</b> for the foot of the steps, and <span id="nBedLo">0.6</span>–<span id="nBedHi">1.1</span> m as the honest range. Two caveats. The survey is from 2011, and the steps were built some time before April 2021 (see below), so their foot may not sit exactly on the old beach. And storms shift stones and sand. If the bottom step sits a step or two below the old beach, you have 20–40 cm more water than we say. If weed and gravel have built up, you have less.</p>
+<figure class="fig"><svg id="datumFig" role="img" aria-label="Every level the page uses, on one scale in metres above OD Malin"></svg>
+<figcaption>Every level on this page on one scale, in metres OD Malin. The blue band is the Point's range from mean low water springs to mean high water springs. Dashed lines are other people's datums, explained below.</figcaption></figure>
+<h3>Mean sea level, and the Roonagh puzzle</h3>
+<p>Tide predictions give heights above a local "lowest astronomical tide", and every gauge's LAT is its own. To get from tide heights to OD Malin, we only need to know where mean sea level sits on OD Malin. The Marine Institute's own gauges either side of Clew Bay agree closely: Galway +0.03 m, Inishmore +0.05 m, Ballyglass +0.07 m, Sligo +0.08 m<a class="cite" href="#s-intgn">intgn</a>. We use <b>+<span id="nMSL">0.06</span> m</b>.</p>
+<p>The Roonagh gauge, the one the tide comes from, reports its own mean sea level at <b>+0.376 m</b>, with its LAT at −1.955 m<a class="cite" href="#s-roonagh">roonagh</a>. That is about 0.3 m above every neighbour, and the Marine Institute calls Roonagh "one of the most challenging sites of the entire collection to measure sea level". It also warns that "unresolved offset issues" are possible across the network. So we don't use Roonagh's datum, only the shape and timing of its tide. If Roonagh's figure turns out to be the right one, every depth on this page is about 0.3 m too low, and there'd be more water than we say. INFOMAR's charts use yet another LAT, from the UK Hydrographic Office's VORF model<a class="cite" href="#s-infomar">infomar</a>. Comparing INFOMAR's land heights with the OPW survey, that LAT comes out about 2.6–2.8 m below OD Malin around Westport (our comparison, tools/analyse_seabed.mjs).</p>
+</div></details>
+  <details id="dOffset"><summary>From Roonagh to the Point</summary><div id="dOffsetBody">
+<p>There is no tide gauge in Westport Bay and no official prediction for Westport. The Marine Institute predicts 38 places around Ireland. The nearest is the gauge on Roonagh pier, at the mouth of Clew Bay, 23 km west of the Point<a class="cite" href="#s-erddap">erddap</a>. The tide takes time to work its way in past the islands and up the channel, so we shift each Roonagh high and low water to the Point. This is the old secondary-port method sailors use, with Roonagh's own curve filling in between. What we have to go on:</p>
+<dl class="kv">
+  <dt>Inishgort</dt><dd>The lighthouse island about 8 km west-north-west of the Point. In the UK Hydrographic Office's Admiralty predictions, it runs 22 min behind Roonah Quay at high water and 34 min behind at low water, with the same range to within 0.1 m. That is our comparison for 17–24 Oct 2026<a class="cite" href="#s-easytide">easytide</a>.</dd>
+  <dt>1868</dt><dd>The Admiralty <i>Sailing Directions</i>: high water at full and change at 4 h 38 m at Clare Island and at 4 h 57 m at Westport, so 19 min later. Springs rise 12¼ ft at Clare Island and 12¾ ft at Westport; neaps rise 9½ ft at both<a class="cite" href="#s-hoskyn">hoskyn</a>.</dd>
+  <dt>1837 / 1912</dt><dd>Lewis has spring tides rising 14 ft at the quays<a class="cite" href="#s-lewis">lewis</a>. A botanist on the Clare Island Survey gives "about 15 feet" of spring rise and fall at Westport Quay, and adds that "On Clare Island the range is, if anything, greater"<a class="cite" href="#s-cotton">cotton</a>.</dd>
+  <dt>2016</dt><dd>The Council's engineers drew the new slipway and pontoon with tide levels "From Admiralty Tide Tables For Inishgort": MHWS +1.8, MHWN +0.8, MLWN −0.8 and MLWS −1.8 m OD Malin<a class="cite" href="#s-mwp16">mwp16</a>. One sheet of the same set says +2.3 m for MHWS.</dd>
+</dl>
+<p>So the page puts <b>high water <span id="nDtHW">30</span> min</b> and <b>low water <span id="nDtLW">45</span> min</b> after Roonagh. Spring high waters are 10 cm higher than Roonagh's and spring lows 10 cm lower, which follows the 1868 half-foot; neaps are the same as Roonagh's. That gives the Point a mean high water springs of <b>+<span id="nPMHWS">1.9</span> m</b> and a mean high water neaps of <b>+<span id="nPMHWN">0.9</span> m</b> OD Malin. These are close to the 2016 drawing, and they are why the foot of the steps sits right at neap high water.</p>
+<p class="note">This is the biggest uncertainty on the page, along with the seabed. Twenty minutes either way would surprise nobody, nor would 20 cm. The check below is there to sort it out.</p>
+</div></details>
+  <details id="dModel"><summary>The tide model in this page</summary><div id="dModelBody">
+<p>The Marine Institute publishes 5-minute predictions for Roonagh for 2026 to 2028 (CC BY 4.0). Its predictions come from harmonic analysis of the gauge record<a class="cite" href="#s-mipred">mipred</a>. Rather than ask their server every time someone opens this page, we fitted <span id="nCons">54</span> tidal constituents (M2, S2, N2, K1, O1 and the rest, down to the shallow-water M4, MS4 and M6) to all three years. Your phone then works the tide out itself. It applies the standard 18.6-year nodal corrections, so it works with no signal at the Quay and keeps going past 2028.</p>
+<p><b>How good is it?</b> Fitted on 2026 alone and checked against the Marine Institute's own 2028 predictions, it is within <span id="nRms">1.7</span> cm on average (root mean square), <span id="nMax">6</span> cm at worst, and gets high and low water to within about <span id="nTime">2</span> minutes. The Marine Institute's series only comes in 5-minute steps, so you can't check the times any closer than that.</p>
+<p>The constants give Roonagh a mean level of <span id="nZ0">2.48</span> m above its LAT. Mean high water springs is <span id="nMHWS">4.24</span> m, high water neaps <span id="nMHWN">3.30</span> m, low water neaps <span id="nMLWN">1.66</span> m and low water springs <span id="nMLWS">0.72</span> m. The highest predicted tide from 2026 to 2044 is <span id="nHAT">4.88</span> m. The lowest comes out at 0.00 m, which is what LAT means, so the nodal corrections are behaving.</p>
+<p>The springs come about <span id="nAge2">33</span> hours after new and full moon here. That is the "age of the tide", worked out from the gap between the S2 and M2 phases.</p>
+<p class="note">This is the astronomical tide only. Weather is not in it. A deep low or a south-westerly gale can add tens of centimetres, and a big high can take some off. The highest water on record at the Quay was 2.75 m OD on 15 December 2012, according to the flood study for the Westport Local Area Plan<a class="cite" href="#s-jba">jba</a>, just a quarter of a metre below the promenade.</p>
+</div></details>
+  <details id="dWorks"><summary>The steps, the shelters and the shower</summary><div id="dWorksBody">
+<p>It didn't come in one go, and we never found drawings for the steps themselves. What the record shows:</p>
+<dl class="kv">
+  <dt>2010</dt><dd>The town plan for 2010–16 set the aim to "create a bathing area at Roman Island with associated facilities"<a class="cite" href="#s-plan2010">plan2010</a>.</dd>
+  <dt>Apr 2021</dt><dd>The steps were there by then. The Westport Tourism Organisation told the Council: "The concrete steps at the Point cater to the brave sea swimmers who are growing in number every week. We recommend a lifeguard in July &amp; August"<a class="cite" href="#s-wto2021">wto2021</a>. Another submission asked for "sheltered changing and rest areas for swimmers at the point"<a class="cite" href="#s-west2021">west2021</a>.</dd>
+  <dt>Summer 2021</dt><dd>The TidyTowns judge: "The work at Roman Island appears to be very well executed and is I am sure greatly appreciated by all the hardy sea swimmers"<a class="cite" href="#s-tt2021">tt2021</a>.</dd>
+  <dt>2022</dt><dd>TidyTowns again: "the Point Swimming Area for the hardy open water swimmers with steps, picnic benches, toilet and even a mobile sauna"<a class="cite" href="#s-tt2022">tt2022</a>. In December, Irish Water quoted €37,000 for a cold shower: €32,000 for the connection, 240 m of pipe, and €5,000 for the shower<a class="cite" href="#s-ctshower">ctshower</a>.</dd>
+  <dt>2023</dt><dd>€60,000 came from the Department of Rural and Community Development's Community Recognition Fund for "Installation of Amenity Facilities at the Point, Quay, Westport"<a class="cite" href="#s-crf2023">crf2023</a>. In August the Council put out a brief for artists to paint two precast concrete shelters for swimmers, each 4.7 m long, 1.4 m deep and 2.24 m high<a class="cite" href="#s-artbrief">artbrief</a>.</dd>
+  <dt>2024</dt><dd>In February, "Shelters at The Point are nearly completed"<a class="cite" href="#s-ct2024">ct2024</a>. On 18 September the Council announced: "New shelters and an outdoor shower were recently constructed and are now operating"<a class="cite" href="#s-wp2024">wp2024</a>. The TidyTowns judges liked "the covered seats, the low sea washed stones as a barrier to the fall from the quay and the steps leading down to the sea floor"<a class="cite" href="#s-tt2024">tt2024</a>.</dd>
+  <dt>Now</dt><dd>"The Point is now used all year round for summer and winter swimming," Cllr Peter Flynn told a Council committee this month<a class="cite" href="#s-wp2026">wp2026</a>. The 2024–30 town plan wants "a lido pool and disabled access beside the existing entrance steps"<a class="cite" href="#s-lap2024">lap2024</a>. A €500,000 bid for the Quay and Roman Island failed to get funding in January<a class="cite" href="#s-ct2026jan">ct2026jan</a>. In August the Council put €100,000 into a masterplan for the Roman Island end of the Quay<a class="cite" href="#s-ct2026aug">ct2026aug</a>.</dd>
+</dl>
+<p>All of this was done by Mayo County Council; the TidyTowns reports credit "Mayo Co Co" by name. The 2019 slipway and pontoon, €225,000 of Department funding, were a separate job, further east on the river channel<a class="cite" href="#s-ct2019">ct2019</a>.</p>
+<p class="note"><b>Not found:</b> when the steps and the stone edge were built, what they cost, and any drawing with their levels (no Part 8 or foreshore licence for them turned up). So the picture at the top draws ten even steps between the 2011 survey's ground levels. If you know the year, or have counted the steps, that's the kind of thing this page wants to be corrected on.</p>
+</div></details>
+  <details id="dHistory"><summary>Roman Island and the Quay</summary><div id="dHistoryBody">
+<p><b>Where the name comes from: unknown.</b> The name turns up in town plans, planning files and the National Inventory of Architectural Heritage, but none of them explains it. The Schools' Collection has nothing on it, and logainm.ie's page was closed to our searches. Ask around.</p>
+<p>Roman Island is "a low drumlin … connected by a causeway to the mainland at Westport Quay". It went from "pleasure gardens in 1840s" to industry and the port, according to an architect's statement summarised in the 2019 planning appeal<a class="cite" href="#s-abp">abp</a>. A local-history blog reads the early Ordnance Survey map as showing a true island, joined by the causeway before 1913. It says the 25-inch map shows a Bath Hotel and a bathing house with hot salt-water seaweed baths<a class="cite" href="#s-lifetime">lifetime</a>; the 2005 town plan mentions "the former site of the Old Bath Hotel"<a class="cite" href="#s-lap2005">lap2005</a>. A six-storey shipping store went up on the island in 1908 to a design by William Friel. It was demolished in 2015<a class="cite" href="#s-niahstore">niahstore</a>. The fish-feed plant on the island reopened as Irish Pet Foods in November 2016<a class="cite" href="#s-ct2016">ct2016</a>.</p>
+<p>The Quay itself is listed as "built 1780; extant 1818 … Undergoing reconstruction, 1837"<a class="cite" href="#s-niahquay">niahquay</a>. Lewis, in 1837, has the port founded in 1780 for the herring fishery, and adds: "The quays are now being extended, and when completed will be nearly a mile in length"<a class="cite" href="#s-lewis">lewis</a>. The big stores along it were built between the Act of Union and 1840, according to a 1930s Schools' Collection account<a class="cite" href="#s-duchas">duchas</a>. By the mid-20th century the port was in decline<a class="cite" href="#s-ctport">ctport</a>.</p>
+<p>People swam here long before the steps. Mayo County Library's Lyons collection includes "Young swimmers at the Point Roman Island Westport. Taken in 1950s", "Ladies Swimming Club at Westport Quay, 1955" and "Old Bath Hotel &amp; Roman Island, Westport, 1972"<a class="cite" href="#s-lyons">lyons</a>. Football was "regularly played at The Point". In one 1960s game Mickey Guthrie, "a noted swimmer and lifesaver, dived into the sea" after the ball<a class="cite" href="#s-ct2021">ct2021</a>.</p>
+</div></details>
+  <details id="dBathing"><summary>Is it an official bathing water?</summary><div id="dBathingBody">
+<p><b>No.</b> The Point is not one of the 153 identified bathing waters that the EPA classified in 2025. Mayo has 16 of them and none is in Westport<a class="cite" href="#s-epa">epa</a>, and it isn't among the 240 places on beaches.ie either<a class="cite" href="#s-beaches">beaches</a>. The nearest identified water is Bertra, 6.8 km west, rated Excellent from 2022 to 2025<a class="cite" href="#s-epa">epa</a>.</p>
+<p>The Council does treat it as a bathing place, though. It names "The Point, Westport" among its bathing areas when it warns about water quality<a class="cite" href="#s-ct2025">ct2025</a>. It has put up prior-warning notices before heavy rain, and it has issued Do Not Swim notices here:</p>
+<ul>
+  <li>June 2022, "due to elevated levels of bacteria"<a class="cite" href="#s-mwr2022">mwr2022</a></li>
+  <li>November 2022, after "an incident with the Quay Road wastewater pump station"<a class="cite" href="#s-ctdns2022">ctdns2022</a></li>
+  <li>August 2023<a class="cite" href="#s-mwr2023">mwr2023</a></li>
+  <li>late August and September 2024, "due to deterioration in bathing water quality"<a class="cite" href="#s-dns2024">dns2024</a></li>
+</ul>
+<p>We found no sampling results published for the Point. After heavy rain, check beaches.ie and mayo.ie before you go in. In 2026 the Council ran its yearly call for nominations for new bathing waters; it closed on 25 September<a class="cite" href="#s-mayo2026">mayo2026</a>.</p>
+<p>There is no lifeguard. The Point isn't on the Council's list of lifeguarded beaches<a class="cite" href="#s-lifeguards">lifeguards</a>. In June 2017 a man drowned while swimming with others at the Point<a class="cite" href="#s-it2017">it2017</a>.</p>
+</div></details>
+  <details id="dTemp"><summary>Water temperature: whose number?</summary><div id="dTempBody">
+<p>Nobody measures the water at the steps, so the number on the card is a model's.</p>
+<ul>
+<li><b>Marine Institute NE Atlantic model</b> (ROMS, about 1.4 km grid), sea-surface temperature, hourly<a class="cite" href="#s-neatl">neatl</a>. The model has no water cells inside Westport Bay. The nearest one is at 53.806 N, 9.631 W, <span id="nNeatlKm">4.7</span> km west of the Point, out past the channel.</li>
+<li><b>Météo-France sea-surface temperature</b> through Open-Meteo's marine service (0.08°, about 8 km)<a class="cite" href="#s-ommarine">ommarine</a>. Its nearest cell is about 9 km north-west of the Point. We use it only if the Marine Institute doesn't answer, and show it alongside when both do.</li>
+</ul>
+<p>For a feel of the seasons, the Marine Institute's coastal temperature network had a logger 1 m down at Inishoo Bay, 9 km up the bay, from 2005 to 2009<a class="cite" href="#s-ictemp">ictemp</a>. Its monthly means:</p>
+<div class="fig"><svg id="climFig" role="img" aria-label="Monthly mean sea temperature at Inishoo Bay, 2005 to 2009"></svg><figcaption>Monthly mean water temperature 1 m down at Inishoo Bay, 2005–09 (Marine Institute). Red: this month.</figcaption></div>
+<p>The shelf at the steps is only a metre or two deep when it's covered, and it has been lying in the sun or the frost a few hours before. So the water at the steps follows the weather more than the bay does: warmer than the model on a sunny summer afternoon on the flood, colder on a frosty winter morning. We round to the half degree and wouldn't bet on the half.</p>
+</div></details>
+  <details id="dChop"><summary>Chop: which winds reach the steps</summary><div id="dChopBody">
+<p>Chop in a bay this sheltered is wind waves, made on the spot. Ocean swell doesn't get in past the islands. How big they get depends on the wind speed and on the <b>fetch</b>: the stretch of open water upwind of the steps. We measured the fetch from the swimming spot every 5° using OpenStreetMap's coastline<a class="cite" href="#s-osm">osm</a>, averaged over ±15°. At lower tides we also stop it where INFOMAR's survey has a bank above the water<a class="cite" href="#s-infomar">infomar</a>.</p>
+<div class="fig"><svg id="roseFig" role="img" aria-label="Fetch at the Point by wind direction"></svg><figcaption>How far the wind can blow over water before it reaches the steps, by the direction it comes from, at a typical swimming tide (log scale). Westerlies get 2–4 km of water, south-westerlies a few hundred metres to 2 km; north-west round to east are off the land.</figcaption></div>
+<p>The wave height is the US Army Corps of Engineers' shallow-water forecasting formula from the <i>Shore Protection Manual</i> (1984)<a class="cite" href="#s-spm">spm</a>. It takes the forecast wind at 10 m from Open-Meteo<a class="cite" href="#s-omfc">omfc</a>, the fetch and the mean depth along it. We cap the result where the water at the steps is too shallow to hold a bigger wave. Words for the significant wave height: under 4 cm <b>flat calm</b>, under 10 cm <b>ripples</b>, under 20 cm <b>light chop</b>, under 35 cm <b>choppy</b>, under 55 cm <b>rough</b>, then <b>very rough</b>. It assumes a steady wind that has been blowing for a while. Gusts, squalls and the odd boat wake are not in it.</p>
+</div></details>
+  <details id="dCheck"><summary>Check the model against what you saw</summary><div>
+    <p>If you were at the Point, tell the page what the water was doing and when. It works out the water level that implies and sets it against the prediction. Do this a few times, at different states of the tide, and you'll know how far to trust the page, or you can let it correct itself. <b>Nothing is sent anywhere</b>: the observations live in this browser only.</p>
+    <form class="tool" id="chk">
+      <div class="two"><div><label for="chkDate">Date</label><input id="chkDate" name="date" type="date" required></div><div><label for="chkTime">Time</label><input id="chkTime" name="time" type="time" required></div></div>
+      <label for="chkKind">What you saw</label>
+      <select id="chkKind" name="kind">
+        <option value="foot">Water's edge right at the foot of the steps</option>
+        <option value="depth">Standing at the foot of the steps, the water came to my…</option>
+        <option value="step">The water was at a step (counting down from the top)</option>
+        <option value="top">The water was up to the top of the steps</option>
+      </select>
+      <div id="chkDepthRow" class="two"><div><label for="chkBody">…</label><select id="chkBody" name="body"><option value="ankle">ankles</option><option value="knee">knees</option><option value="hip">hips</option><option value="waist" selected>waist</option><option value="chest">chest</option><option value="shoulder">shoulders</option></select></div><div><label for="chkH">Your height (cm)</label><input id="chkH" name="height" type="number" min="100" max="220" value="172"></div></div>
+      <div id="chkStepRow"><label for="chkStep">Step number, top step = 1</label><input id="chkStep" name="step" type="number" min="1" value="5"></div>
+      <div class="btns"><button type="submit">Compare</button><button type="button" class="ghost" id="chkSave">Compare and save</button></div>
+      <div class="out" id="chkOut"></div>
+    </form>
+    <p class="small" id="chkSum"></p>
+    <ul class="obs" id="chkList"></ul>
+    <div class="btns tool" style="border:0;padding:0;background:none"><button type="button" id="chkApply" disabled>Use my average correction on this page</button><button type="button" class="ghost" id="chkReset">Back to the uncorrected model</button><button type="button" class="ghost" id="chkClear">Delete my check sightings</button></div>
+    <p class="small" id="chkState"></p>
+    <p class="small">The step heights here come from the page's own picture of the steps (the promenade and the foot from the 2011 survey, the steps spaced evenly between them), so "step 5" is only as good as that picture. "Water's edge at the foot of the steps" is the cleanest thing to report.</p>
+  </div></details>
+  <details id="dSources"><summary>Sources and licences</summary><div><ol class="sources" id="sourceList"></ol></div></details>
+</section>
+</main>
+<footer>
+  <p>The skyline behind the steps is the real one, Croagh Patrick from the Quay, borrowed from the Croagh Patrick page<a class="cite" href="#s-reek">reek</a> (heights stretched for legibility). Static page, no tracking, no accounts. Tide from Marine Institute predictions, fitted here and computed in your browser, so it works with no signal at the Quay; only the wind and water temperature need the internet. Try <a href="?at=2026-10-26T17:45">a spring high water at dusk</a>, <a href="?at=2026-10-27T12:30">a spring low at midday</a> or <a href="?at=2027-07-06T20:40">a July evening</a>; <a href="./">back to now</a>.</p>
+</footer>
+<div class="sheet" id="cardSheet" hidden><div class="panel" role="dialog" aria-label="Share card">
+  <button class="close" data-close aria-label="Close">×</button>
+  <h3>Share this swim</h3>
+  <div class="seg" id="cardFormat"><button data-f="portrait" aria-pressed="true">4:5</button><button data-f="square" aria-pressed="false">square</button></div>
+  <img class="cardPreview" id="cardImg" alt="The share card">
+  <div class="row"><button id="cardShare">Share</button><button class="ghost" id="cardSave">Save image</button></div>
+  <p class="small">It's for the swim group's WhatsApp. It's an image: nothing about you is in it, and nothing is sent until you choose where it goes.</p>
+</div></div>
+<div class="sheet" id="inSheet" hidden><div class="panel" role="dialog" aria-label="Dip logged">
+  <button class="close" data-close aria-label="Close">×</button>
+  <h3 id="inTitle">In you go</h3>
+  <p id="inSummary"></p>
+  <p><b>Where was the water?</b> <span class="small">(optional: it checks the prediction)</span></p>
+  <div class="stepPick"><svg id="stepPick" role="group" aria-label="Pick where the water was on the steps"></svg></div>
+  <p class="picked" id="inPicked"></p>
+  <div class="row"><button id="inDone">Done</button><button class="ghost" id="inUndo">Undo this dip</button></div>
+</div></div>
+<div class="toast" id="toast" hidden></div>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

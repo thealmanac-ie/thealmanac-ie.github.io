@@ -1,0 +1,10 @@
+/* Additions to the Reek app's page for the public site (inlined at build). */
+.hero .kicker { font: 600 15px/1.2 var(--sans); letter-spacing: 0.02em; margin: 0 0 6px; opacity: .85; }
+.answer-line .asof { font-weight: 600; }
+.sec-crumbs { padding-top: 16px; padding-bottom: 0; }
+.sec-crumbs .crumbs { color: #4a525b; margin: 0; }
+.viewlist { margin-top: 16px; }
+.viewlist > summary { cursor: pointer; font-weight: 600; padding: 8px 0; }
+.viewlist .vgroup { font: 600 13px var(--sans); color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin: 18px 0 6px; }
+.viewlist .vcard { margin: 0 0 10px; }
+.site-foot { font-family: var(--sans); }

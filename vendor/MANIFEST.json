@@ -1,0 +1,59 @@
+{
+ "about": "Runtime files of the lab apps, copied and scrubbed by tools/sync.mjs. Do not edit by hand: change the lab app and re-sync.",
+ "synced": "2026-10-19T11:30:02.969Z",
+ "apps": {
+  "swim": {
+   "from": "swim (lab folder)",
+   "files": {
+    "index.html": "8ac5fd879ed0540c",
+    "css/swim.css": "0eb2a0abf51a01dd",
+    "js/app.js": "c81134075c4140f9",
+    "js/card.js": "0da628ee1fb1a83a",
+    "js/chart.js": "214d8b69251148a6",
+    "js/check.js": "08f07a7a2d5b8c58",
+    "js/chop.js": "732cb582a1500a2e",
+    "js/future.js": "91a7ae4f4c641c24",
+    "js/hero.js": "ed27bafaf365bbe0",
+    "js/log.js": "0dfc41599373becb",
+    "js/point.js": "77abc8674a1e16a6",
+    "js/sources.js": "9b223de9d0753fbc",
+    "js/tide.js": "1a09d03f9a958188",
+    "js/util.js": "0e740edd6be98e04",
+    "js/weather.js": "481c1cf746b321a5",
+    "data/fetch.json": "f7a899edbf65e402",
+    "data/flood.json": "a723342cd7bb573b",
+    "data/future.json": "77666d04f700b1d3",
+    "data/map.json": "235e476fdc71e591",
+    "data/map.png": "cb5bd4bdfe0f9fcd",
+    "data/point.json": "7a98abed1016413f",
+    "data/seatemp_clim.json": "9658ccd55eff4190",
+    "data/skyline.json": "ebc294a22cfecb4f",
+    "data/slr.json": "6d98cd696872a538",
+    "data/tide_model.json": "7b3777e20e8a2439"
+   }
+  },
+  "reek": {
+   "from": "reek (lab folder)",
+   "files": {
+    "index.html": "f11816c3c8c66024",
+    "css/reek.css": "61f6b4762aab8953",
+    "js/app.js": "fd3806769d4f8f8f",
+    "js/forecast.js": "2b6fab2bcb1d433a",
+    "js/hero.js": "cdc82bd84ae20d9f",
+    "js/pano.js": "830b3934546f3989",
+    "js/sky.js": "887afe079ed7d144",
+    "js/sources.js": "4d42cb8a16041670",
+    "js/weather.js": "cfc98126197705f9",
+    "js/where.js": "051aa93dafb2e95a",
+    "data/hero.json": "eecd85fee77e3d70",
+    "data/horizon.json": "526bce689cec13e3",
+    "data/pano.png": "8aa344a55cf9a97b",
+    "data/peaks.json": "455a9b7c836e8058",
+    "data/places.json": "7443286fcc77ffa9",
+    "data/viewshed-far.png": "82e3b6da3325d08a",
+    "data/viewshed-near.png": "8fbcb95cb63042ab",
+    "data/viewshed.json": "86b8f4cb8ff62217"
+   }
+  }
+ }
+}

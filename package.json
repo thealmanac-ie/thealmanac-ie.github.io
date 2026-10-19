@@ -1,0 +1,25 @@
+{
+  "name": "thealmanac",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Static site generator for The Almanac: tides, sun, moon and weather, live and local, one path per place.",
+  "license": "SEE LICENSE IN README.md",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "sync": "node tools/sync.mjs",
+    "fonts": "node tools/fonts.mjs",
+    "build": "node lib/build.mjs",
+    "serve": "node tools/serve.mjs",
+    "test": "node tools/test.mjs",
+    "perf": "node tools/perf.mjs",
+    "shots": "node tools/shots.mjs"
+  },
+  "dependencies": {
+    "esbuild": "0.28.2",
+    "linkedom": "0.18.13",
+    "playwright-core": "1.62.1"
+  }
+}

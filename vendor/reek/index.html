@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en-IE">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Can I see the Reek today?</title>
+<meta name="description" content="Is the top of Croagh Patrick (Cruach Phádraig, 764 m) in cloud right now? A live estimate, the next clear spell, and the real view from the summit.">
+<meta name="theme-color" content="#1b2430">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800;9..144,900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/reek.css">
+</head>
+<body>
+
+<!-- ============================== SURFACE ============================== -->
+<header id="hero" class="hero" data-verdict="loading">
+  <canvas id="heroCanvas" aria-hidden="true"></canvas>
+  <div class="hero-inner">
+    <p class="kicker">Can I see the Reek today?</p>
+    <h1 id="answer" class="answer" aria-live="polite">&hellip;</h1>
+    <p id="answerLine" class="answer-line">Looking at the sky over Clew Bay&hellip;</p>
+    <div class="hero-meta">
+      <p id="nextWindow"></p>
+      <p id="glowLine"></p>
+    </div>
+  </div>
+  <div class="hero-foot">
+    <p id="heroCaption">Cruach Phádraig, 764 m, as seen from Westport Quay</p>
+    <nav class="hero-nav" aria-label="Sections">
+      <a href="#days">Next 3 days</a><a href="#view">View from the top</a><a href="#where">From where you are</a><a href="#deep">The mountain</a><a href="#sources">Sources</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<!-- ============================== MIDDLE ============================== -->
+<section id="days" class="sec">
+  <h2>The next three days</h2>
+  <p class="lede">Grey is cloud; the dashed line is the summit. When the cloud floor sits above the line, the top is out.</p>
+  <div id="chartWrap" class="chart-wrap">
+    <div id="chartReadout" class="readout" aria-live="polite"></div>
+    <svg id="chart" role="img" aria-label="Estimated cloud base against the summit height, next 72 hours"></svg>
+  </div>
+  <h3 class="h3">Best clear spells this week</h3>
+  <ol id="bestWindows" class="windows"></ol>
+  <p class="fine">Daylight only. Each hour is a vote between three weather models; "sure" means all three agree.</p>
+</section>
+
+<section id="climb" class="sec sec-tight">
+  <h2>Going up?</h2>
+  <div id="climbCard" class="climb"></div>
+</section>
+
+<section id="how" class="sec sec-tight">
+  <details class="how">
+    <summary><span>How we work this out</span><small>It's an estimate. Here's the arithmetic.</small></summary>
+    <div class="how-body">
+      <p>Nobody measures cloud on the summit, so this is worked out from forecasts. Every visit, the page asks <a href="#src-openmeteo">Open-Meteo</a> for three weather models (UK Met Office, DWD&nbsp;ICON, ECMWF): temperature and humidity at fixed pressure levels from about 100&nbsp;m up to 3&nbsp;km over the Reek, plus rain and wind.</p>
+      <ol>
+        <li><b>Cloud base.</b> Air rising cools until it condenses. A long-standing rule of thumb puts that height at about <b>125&nbsp;m for every °C</b> between the temperature and the dew point (<a href="#src-lawrence">Lawrence 2005</a>). We work it out for air at summit height and for air up to 250&nbsp;m below it, because wind shoves air up the mountain: the stronger the wind, the deeper the layer it lifts (we allow 6&nbsp;m of lift per km/h of wind, up to 250&nbsp;m; that number is our guess, not a law). We also take the lowest level where the model's own air is 95% humid or more. The lower of the two is our cloud base.</li>
+        <li><b>Verdict.</b> Base more than 40&nbsp;m below the top: <b>no</b>. Within about 120&nbsp;m above it, where a cap of cloud comes and goes: <b>partly</b>. Higher: <b>yes</b>. If the low layer is patchy (the model has under 40% low cloud) it only counts as partly. Rain of 1.5&nbsp;mm an hour or more counts as no, 0.4&nbsp;mm as partly, and fog at the foot (visibility under 1&nbsp;km at Murrisk) as no.</li>
+        <li><b>Vote.</b> Each model gets a say for each hour (no&nbsp;=&nbsp;0, partly&nbsp;=&nbsp;1, yes&nbsp;=&nbsp;2); the average decides, and the page says when they disagree. The clear spells only count daylight hours.</li>
+      </ol>
+      <p><b>Why it can be wrong.</b> Weather models see the world in boxes 2 to 25&nbsp;km wide. In those boxes the Reek is a gentle bump, not a 764&nbsp;m cone that makes its own cloud. Wet Atlantic air, a wind off the bay and a mountain standing alone in it is about the best recipe there is for a cap cloud that the models never see. So treat "partly" as "go and look".</p>
+      <div id="howNow" class="how-now"></div>
+      <p class="fine">The picture at the top is the real skyline from Westport Quay, worked out from the same elevation data as the panorama below, with heights stretched 1.5&times;. The grey is drawn at the estimated cloud base.</p>
+    </div>
+  </details>
+</section>
+
+<section id="view" class="sec">
+  <h2>The view from the top</h2>
+  <p class="lede">What you would see from the summit on a clear day, worked out from elevation data rather than drawn by hand. Drag to look round. Tap a name.</p>
+  <div class="pano-wrap">
+    <canvas id="pano" aria-label="Panorama from the summit of Croagh Patrick"></canvas>
+    <div class="pano-hud"><span id="panoBearing">W</span></div>
+    <button class="pano-btn left" id="panoLeft" aria-label="Look left">&lsaquo;</button>
+    <button class="pano-btn right" id="panoRight" aria-label="Look right">&rsaquo;</button>
+  </div>
+  <div id="panoChips" class="chips" role="list"></div>
+  <div id="panoCard" class="card pano-card" hidden></div>
+  <label class="toggle"><input type="checkbox" id="panoHidden"> Show what's just out of sight</label>
+  <p id="panoSun" class="sun-line"></p>
+  <p class="fine">Heights stretched 3&times; so distant hills read. Standard refraction (<i>k</i>&nbsp;=&nbsp;0.13) and the curve of the Earth are included; from 764&nbsp;m the sea horizon is about 106&nbsp;km out and 0.83° below level. Faint names far off are "on paper": the line of sight clears, but you'd need the clearest air of the year.</p>
+</section>
+
+<section id="where" class="sec">
+  <h2>Can you see it from where you are?</h2>
+  <p class="lede">The gold wash is everywhere the summit is in direct line of sight for someone standing up. Tap the map, use your location, or pick a place.</p>
+  <div class="where-actions">
+    <button id="geoBtn" class="btn">Use my location</button>
+    <span class="or">or tap the map</span>
+  </div>
+  <div id="map" class="map" aria-label="Map showing where the summit is in line of sight"><div class="map-fallback">The map needs WebGL. The list of places below still works.</div></div>
+  <div id="whereCard" class="card where-card" hidden></div>
+  <details class="places">
+    <summary>Pick a place</summary>
+    <div id="placeList" class="place-list"></div>
+  </details>
+</section>
+
+<!-- ============================== DEEP ============================== -->
+<section id="deep" class="sec deep">
+  <h2>The mountain, deeper</h2>
+  <p class="lede">For the locals and the nerds: what's known, what's told, and where they argue. Small numbers link to the sources.</p>
+  <div id="deepContent">
+    <article id="name">
+      <h3>The name, and the height</h3>
+      <p><i>Cruach</i> is first a rick or stack, of corn or hay; stretched to hills it means one with a round, stacked, piled-up look, and in place names it usually comes out as Croagh or Crogh.<sup><a class="ref" href="#src-joyce"></a></sup> So <i>Cruach Phádraig</i> is Patrick's stack, and the local name, <i>the Reek</i>, is the same word in Hiberno-English: a rick.<sup><a class="ref" href="#src-wpcroagh"></a></sup> Before Patrick took it over it was <i>Cruachán Aighle</i>.<sup><a class="ref" href="#src-lg114135"></a></sup> Tírechán, writing about 700, sends Patrick <i>ad montem Egli</i>, to the mountain of Aigle, and has Murrisk as <i>Muiriscc Aigli</i>, which he explains as the plain between the sea and Aigle (<i>campum inter mare et Aigleum</i>): Aigle seems to have been the name of the district.<sup><a class="ref" href="#src-tirechan"></a></sup> The medieval lore of places tells it as legend: the hill was once Cruachán Garbrois and was renamed for Aigle son of Derg, killed there.<sup><a class="ref" href="#src-dindshenchas"></a></sup> For all its fame, logainm.ie still lists the Irish name as "non-validated".<sup><a class="ref" href="#src-lg114135"></a></sup></p>
+      <p>Height: <b>764&nbsp;m</b> to the Geological Survey and Mayo County Council.<sup><a class="ref" href="#src-gsi"></a>,<a class="ref" href="#src-mayoclimb"></a></sup> You will also meet 765&nbsp;m, including in a 2013 footpath report for Mountaineering Ireland.<sup><a class="ref" href="#src-elfyn"></a></sup> The rock is mostly Silurian quartzite, which is why the cone is a slope of pale, loose scree.<sup><a class="ref" href="#src-gsi"></a></sup></p>
+    </article>
+
+    <article id="pilgrimage">
+      <h3>Reek Sunday and the three stations</h3>
+      <p>The pilgrimage day has been the last Sunday in July "from time immemorial", as the Catholic Encyclopedia put it in 1908; a papal indulgence of 1432 already names the Sunday before the feast of St Peter's Chains (1&nbsp;August), which always lands on the last Sunday of July.<sup><a class="ref" href="#src-catholicenc"></a></sup> In Irish it is <i>Domhnach na Cruaiche</i>.<sup><a class="ref" href="#src-bishops"></a></sup> Plenty of locals go on the Friday before, Garland Friday, and until the 1970s pilgrims climbed through the night.<sup><a class="ref" href="#src-tuam"></a></sup> <span id="nextReek"></span></p>
+      <p>Nobody counts. Estimates: 60,000 in 1965, about 25,000 in 1999, 15,000 to 20,000 in 2014.<sup><a class="ref" href="#src-rte1965"></a>,<a class="ref" href="#src-rte1999"></a>,<a class="ref" href="#src-irishcatholic2014"></a></sup> Over a whole year it's put at about 100,000 to 120,000 climbers.<sup><a class="ref" href="#src-bishops"></a>,<a class="ref" href="#src-it2024"></a></sup> In 2015 the day was called off after overnight storms left zero visibility on the mountain.<sup><a class="ref" href="#src-irishnews2015"></a></sup></p>
+      <p>The rounds, as the Westport Parish card (2013) sets them out:<sup><a class="ref" href="#src-stations"></a></sup></p>
+      <ol class="stations">
+        <li><b>Leacht Beanain</b>, a small circular cairn at the base of the cone, named for Patrick's disciple Benignus. Seven times round, saying seven Our Fathers, seven Hail Marys and one Creed.</li>
+        <li><b>The summit.</b> Kneel and say seven, seven and one; pray for the Pope's intentions; walk fifteen times clockwise round the church saying fifteen, fifteen and one; then seven rounds of <b>Leaba Phádraig</b>, Patrick's Bed.</li>
+        <li><b>Roilig Mhuire</b>, some way down the western side: seven times round each of its three cairns, then seven times round the whole enclosure.</li>
+      </ol>
+      <p class="folk"><span class="tag">Argue about it</span>The card says <i>Leacht Beanain</i>; you'll also see Benáin, Benian and Benen, while the Ordnance Survey map has <i>Leacht Mionnain</i> and logainm <i>Leacht Mhionnáin</i>. The Survey's own man had a view in 1838: "Leacht Mionnain, or more properly Leacht Benain, i.e. the Monument of Saint Benignus".<sup><a class="ref" href="#src-smr"></a>,<a class="ref" href="#src-lg114278"></a></sup> Roilig or Reilig Mhuire? The card and the monuments record say Roilig; logainm's standard Irish is Reilig.<sup><a class="ref" href="#src-lg114376"></a></sup> The card also calls it <i>Garraí Mór</i>, and "probably a pre-Christian grave"; the monuments record is more careful: the cairns "may be prehistoric burial sites".<sup><a class="ref" href="#src-stations"></a>,<a class="ref" href="#src-smr"></a></sup> In 1838 the pilgrim there went round each cairn on his knees.<sup><a class="ref" href="#src-smr"></a></sup></p>
+    </article>
+
+    <article id="patrick">
+      <h3>Patrick on the mountain</h3>
+      <p>The oldest account is Tírechán's, from the late 600s: Patrick went to <i>Mons Aiglí</i> to fast for forty days and forty nights, birds troubled him so that "he could not see the face of sky and land and sea", and his charioteer Totmáel died at <i>Muiresc Aigli</i>, Murrisk.<sup><a class="ref" href="#src-tirechan"></a></sup> That the text is old is a fact; what it describes is tradition. The year 441, which you'll see everywhere, is not in Tírechán; the Annals of Ulster for 441 say only that "Bishop Patrick was approved in the Catholic faith".<sup><a class="ref" href="#src-au441"></a>,<a class="ref" href="#src-catholicenc"></a></sup></p>
+      <p class="folk"><span class="tag">Legend</span>In the Tripartite Life (about 900) the mountain fills with black birds "so that he knew not heaven nor earth". Patrick rings his bell at them, loud enough for the men of Ireland to hear, and flings it, knocking a gap out of the mountain; afterwards no demon came to Ireland for seven years, seven months, seven days and seven nights.<sup><a class="ref" href="#src-tripartite"></a></sup></p>
+      <p class="folk"><span class="tag">Folklore</span>A 1930s Mayo school story has Patrick driving the serpents into Loch na Corra, the lake under the mountain's south side, firing his mass-bell after them.<sup><a class="ref" href="#src-duchas"></a></sup></p>
+      <p>And one grim line of record: on St Patrick's night in 1113, says the Annals of Ulster, "a ball of fire" came down on Cruachain Aighle and killed thirty of those fasting there.<sup><a class="ref" href="#src-au1113"></a></sup> So there were people on the summit in March, and in numbers, nine centuries ago.</p>
+    </article>
+
+    <article id="older">
+      <h3>Older than Patrick?</h3>
+      <p>Máire MacNeill's <i>The Festival of Lughnasa</i> (1962) gathered the hilltop gatherings of late July and early August all over Ireland and argued they were survivals of Lughnasa, the Celtic festival of the start of harvest.<sup><a class="ref" href="#src-macneill"></a>,<a class="ref" href="#src-ross"></a></sup> At its heart she found a struggle for the harvest between Crom Dubh, who holds the grain, and Lugh; in the later folk versions Lugh's part is usually taken by Patrick, and Crom Dubh becomes a pagan chief.<sup><a class="ref" href="#src-macneill"></a></sup> Reek Sunday sits squarely in that season, and the idea that the pilgrimage took over an older harvest climb is widely credited to her. It's a scholar's interpretation, not a record.</p>
+      <p class="folk"><span class="tag">Argue about it</span>Garland Sunday and <i>Domhnach Chrom Dubh</i> are names for that Lughnasa Sunday across the west in general.<sup><a class="ref" href="#src-ross"></a></sup> We found no official Croagh Patrick source using them for Reek Sunday itself.</p>
+    </article>
+
+    <article id="summit">
+      <h3>What the digging found on top</h3>
+      <p>In 1994 Gerry Walsh of Mayo County Council excavated on the summit and found "a rectangular dry-stone building, probably an oratory", about 25&nbsp;m east of the present church, 7.76 by 5.52&nbsp;m outside with its door in the east wall.<sup><a class="ref" href="#src-exc1994"></a></sup> Charcoal from inside gave a radiocarbon date of cal. AD&nbsp;430–890; the report calls it "of the Gallarus type".<sup><a class="ref" href="#src-exc1995"></a></sup> In 1997 Michael Gibbons, who worked on the dig, called it "the earliest church building yet excavated in Ireland", which is a big claim for a date range 460 years wide.<sup><a class="ref" href="#src-it1997"></a></sup></p>
+      <p>The summit is ringed by a rubble wall about 154&nbsp;m east to west, noticed as early as 1839. Trenches across it in 1995 turned up glass and amber beads but nothing that dates the wall. The monuments record allows that it is prehistoric, or that it was built or reused for an early medieval monastery; the newspapers went with "Celtic hillfort".<sup><a class="ref" href="#src-smr"></a>,<a class="ref" href="#src-exc1995"></a>,<a class="ref" href="#src-it1997"></a></sup> Inside are 15 to 20 circular hut sites, about 5&nbsp;m across, date unknown.<sup><a class="ref" href="#src-smr"></a></sup></p>
+      <p>The present church was built in 1905 to a design by W.&nbsp;H. Byrne &amp; Son for Archbishop John Healy, and extended in 1962. The Dictionary of Irish Architects dates its dedication to 30 July 1905, which was the last Sunday in July; other accounts say 20 July, a Thursday.<sup><a class="ref" href="#src-dia"></a>,<a class="ref" href="#src-smr"></a></sup> Before it, in 1838, an older <i>Teampull Patruig</i> had "many votive nails and rags" pushed between its stones.<sup><a class="ref" href="#src-smr"></a></sup> For the whole mountain's archaeology, Leo Morahan's 2001 book is the place to go.<sup><a class="ref" href="#src-morahan"></a></sup></p>
+    </article>
+
+    <article id="gold">
+      <h3>The gold</h3>
+      <p>In 1984 prospectors found visible gold in quartz veins at Lecanvey, on the mountain's north side. Drilling outlined a "geological reserve" of 498,000 tonnes at 9.94 grams a tonne: something like five tonnes of gold.<sup><a class="ref" href="#src-emd"></a></sup> The companies were Burmin Exploration and Development and Tara.<sup><a class="ref" href="#src-glencar"></a></sup></p>
+      <p>The campaign moved fast. The Mayo Environmental Group, with Paddy Hopkins as chairman and Seán O'Malley as secretary, had the botanist David Bellamy on their side by April 1989.<sup><a class="ref" href="#src-rte1989"></a></sup> That May the Archbishop of Tuam, Joseph Cassidy, wrote in the Irish Times that "its wealth is not in gold".<sup><a class="ref" href="#src-cassidy"></a></sup> In July 1989 the minister, Bobby Molloy, promised no mining licence without an independent environmental impact assessment.<sup><a class="ref" href="#src-dail1989"></a></sup> On 24 May 1990 he told the Dáil he had decided to use his powers under the Minerals Development Act, 1940 "to exclude Croagh Patrick from prospecting because of the unique cultural and religious importance of the area".<sup><a class="ref" href="#src-dail1990"></a>,<a class="ref" href="#src-rteban"></a></sup> The State's own gold report still records the area as excluded "due to its location near the summit of a mountain of pilgrimage".<sup><a class="ref" href="#src-emd"></a></sup></p>
+      <p class="folk"><span class="tag">Argue about it</span>You'll often read that Mayo County Council stopped the mine. The parliamentary record shows a minister's decision. The council did write a ban on mining into its development plan in 1992, but the courts found that beyond its powers.<sup><a class="ref" href="#src-glencar"></a></sup></p>
+    </article>
+
+    <article id="below">
+      <h3>Below the mountain</h3>
+      <p>The Augustinian friary at Murrisk was founded around 1456 by Hugh O'Malley; the OPW says it "marked the start of the Croagh Patrick pilgrimage".<sup><a class="ref" href="#src-opwmurrisk"></a></sup> (A 1656 document names a Lady Maeve O'Connor as founder instead.<sup><a class="ref" href="#src-smr"></a></sup>) John Behan's bronze coffin ship nearby, the National Famine Memorial, was unveiled by President Mary Robinson on 20 July 1997.<sup><a class="ref" href="#src-faminememorial"></a></sup> Tóchar Phádraig, the old pilgrim road from Ballintubber Abbey, runs 35&nbsp;km to the Reek and was restored in 1987.<sup><a class="ref" href="#src-tochar"></a></sup></p>
+      <p>At Boheh a rock carved with over 250 motifs, known as St Patrick's Chair, has a trick of light: around 18 April and 24 August, seen from the stone, the setting sun appears to roll down the Reek's north flank.<sup><a class="ref" href="#src-smr"></a></sup> That this was a deliberate prehistoric alignment is the argument of Gerry Bracken and P.&nbsp;A. Wayman, made in <i>Cathair na Mart</i> in 1992; it's not settled.</p>
+      <p>Work on a rebuilt path began in December 2020, led by Mayo County Council, and the project was marked finished in April 2024. The Geological Survey's warning about the scree still stands: above 550&nbsp;m it can be very unstable underfoot.<sup><a class="ref" href="#src-mayopath"></a>,<a class="ref" href="#src-mipath"></a>,<a class="ref" href="#src-gsi"></a></sup></p>
+    </article>
+  </div>
+</section>
+
+<section id="sources" class="sec sources">
+  <h2>Sources &amp; method</h2>
+  <div id="sourceList"></div>
+</section>
+</main>
+
+<footer class="foot">
+  <p>An estimate from public forecasts and elevation data. Built for curiosity, not as a safety forecast.</p>
+</footer>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+{
+  "about": "Westport, Co. Mayo: tide times for Westport Quay, and the depth at the swimming steps at the Point. Template: tide-swim (the swim lab app). The per-spot model configuration (tide-station offsets, seabed at the steps, step geometry, datum) is the app's data/point.json, its station's constants are data/tide_model.json and its sources are js/sources.js. Westport is the app's own first instance, so it overlays nothing; a new spot puts its own copies of those files in places/<slug>/app/.",
+  "slug": "westport",
+  "template": "tide-swim",
+  "app": "swim",
+  "name": "Westport",
+  "area": "County Mayo",
+  "listing": {
+    "group": "Mayo",
+    "title": "Westport",
+    "blurb": "Tide times for Westport Quay, and how deep the water is at the swimming steps at the Point, now and for the week.",
+    "order": 1
+  },
+  "seo": {
+    "title": "Westport tide times: high and low water at Westport Quay",
+    "h1": "Westport tide times",
+    "kicker": "Westport Quay, Co. Mayo",
+    "description": "High and low water at Westport Quay today and for the next week, with heights, springs and neaps, and how deep the water is at the swimming steps at the Point."
+  },
+  "tide": {
+    "place": "Westport Quay",
+    "station": "Roonagh",
+    "stationLong": "the Marine Institute's predictions for Roonagh Pier, at the mouth of Clew Bay",
+    "chartDatumBelowMsl": 2.6,
+    "chartDatumNote": "the gap between mean sea level and chart datum in the Admiralty predictions for Inishgort (see 'How deep is it at the steps, really?')"
+  },
+  "spot": {
+    "id": "the-point",
+    "name": "The Point",
+    "short": "the Point",
+    "label": "The Point · Westport Quay",
+    "question": "Is there water at the Point?",
+    "lat": 53.80237,
+    "lon": -9.56025,
+    "locationSource": "OpenStreetMap node 9996872068 (leisure=swimming_area, name=The Point)",
+    "forecastPoint": {
+      "lat": 53.80224,
+      "lon": -9.56032
+    },
+    "seaTempCell": {
+      "lat": 53.80625,
+      "lon": -9.63125
+    },
+    "viewAzimuth": 236,
+    "uncertaintyM": 0.4,
+    "uncertaintyWhy": "Root-sum-square of the page's three named doubts: the datum (about 0.3 m), the Roonagh-to-Point height differences (about 0.2 m) and the seabed at the foot of the steps (about 0.25 m): 0.44 m."
+  },
+  "card": {
+    "at": "2026-10-26T17:45",
+    "title": "Westport tide times",
+    "subtitle": "Is there water at the Point?"
+  },
+  "jsonld": {
+    "@type": "Place",
+    "name": "Westport Quay",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Westport",
+      "addressRegion": "County Mayo",
+      "addressCountry": "IE"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 53.7979,
+      "longitude": -9.5505
+    },
+    "containsPlace": {
+      "@type": "Place",
+      "name": "The Point (swimming steps), Roman Island",
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 53.80237,
+        "longitude": -9.56025
+      }
+    }
+  },
+  "attribution": [
+    "mi-tides",
+    "mi-sst",
+    "open-meteo",
+    "opw-lidar",
+    "infomar",
+    "ar6",
+    "osm",
+    "eudem"
+  ],
+  "related": [
+    "croagh-patrick"
+  ],
+  "withhold": {
+    "flood": "Belt and braces: the swim app no longer publishes the OPW coastal flood extents (CC BY-NC-ND 4.0, no modified copies) and links to floodinfo.ie instead; if its tools ever regenerate the layers, the public build still leaves them out."
+  }
+}

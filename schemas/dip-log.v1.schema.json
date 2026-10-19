@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://thealmanac.ie/schemas/dip-log.v1.schema.json",
+  "title": "Dip log and sightings export (version 1)",
+  "description": "The file a swim page exports from 'Your dips' (and imports again). Each entry with a 'where' is a sighting: what someone saw at the steps, and when. A future shared sightings store should keep the raw observation (t, where) and recompute 'obs' and 'diff' itself, because the implied level depends on the step geometry, which calibration may change. 'spot', 'model' and 'datum' are added by the public build so pooled files say which spot and which tide model they were made against; files without them come from the Point, Westport (the first spot).",
+  "type": "object",
+  "required": ["app", "version", "dips"],
+  "properties": {
+    "app": { "type": "string", "description": "Export format name; 'the-point-westport-dips' for the first spot." },
+    "version": { "const": 1 },
+    "spot": { "type": "string", "pattern": "^[a-z0-9-]+/[a-z0-9-]+$", "description": "Place slug and spot id, e.g. 'westport/the-point'." },
+    "model": { "type": "string", "description": "Tide station and the date its constants were fitted, e.g. 'Roonagh@2026-10-18'." },
+    "datum": { "type": "string", "description": "Vertical datum of level, obs and diff: 'm OD Malin'." },
+    "exported": { "type": "string", "format": "date-time" },
+    "dips": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "t"],
+        "properties": {
+          "id": { "type": "string", "description": "Random per entry; used to skip duplicates on import." },
+          "t": { "type": "number", "description": "Time of the dip or sighting, milliseconds since 1970 (UTC)." },
+          "src": { "enum": ["dip", "check"], "description": "'dip' from the I'm in button, 'check' from Tell us where the water was." },
+          "level": { "type": ["number", "null"], "description": "Predicted water level at t, uncorrected model." },
+          "depth": { "type": ["number", "null"], "description": "Predicted depth at the foot of the steps at t." },
+          "sst": { "type": ["number", "null"] }, "sstSrc": { "type": ["string", "null"] }, "air": { "type": ["number", "null"] },
+          "wind": { "type": ["object", "null"], "properties": { "speed": { "type": ["number", "null"] }, "dir": { "type": ["number", "null"] }, "gust": { "type": ["number", "null"] } } },
+          "chop": { "type": ["string", "null"] },
+          "where": {
+            "type": ["object", "null"],
+            "description": "The observation itself.",
+            "properties": {
+              "kind": { "enum": ["platform", "step", "foot", "body", "below", "text"] },
+              "n": { "type": ["number", "null"], "description": "Step number counted from the top (kind 'step')." },
+              "part": { "type": ["string", "null"], "description": "ankle, knee, hip, waist, chest or shoulder (kind 'body')." },
+              "frac": { "type": ["number", "null"], "description": "That body part's height as a fraction of standing height." },
+              "h": { "type": ["number", "null"], "description": "The person's height in metres." },
+              "text": { "type": ["string", "null"] }
+            }
+          },
+          "obs": { "type": ["number", "null"], "description": "Water level implied by 'where', from the page's step geometry." },
+          "diff": { "type": ["number", "null"], "description": "obs minus level: how far the sea was above (+) or below (-) the prediction." },
+          "shift": { "type": ["number", "null"], "description": "Equivalent time shift of the predicted curve, minutes (checks only)." },
+          "from": { "type": ["string", "null"], "description": "Who or which file an imported entry came from." }
+        }
+      }
+    }
+  }
+}
