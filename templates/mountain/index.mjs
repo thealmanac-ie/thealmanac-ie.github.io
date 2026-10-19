@@ -148,6 +148,8 @@ export async function prerender(ctx, place, info, browser) {
   return { snap, asOf, cards, poster, og, ogHome, thumb, problems };
 }
 
+export const provisional = (ctx, place, info) => html(ctx, place, info, null).html;
+
 export function write(ctx, place, info, pr) {
   const { page, html: out } = html(ctx, place, info, pr);
   const dir = path.join(ctx.dist, place.slug);

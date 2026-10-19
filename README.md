@@ -6,8 +6,11 @@ The old almanac of tides, sun, moon and weather, made live and local, place by p
 |---|---|---|
 | `/` | The list of places (grows with the site) | site page |
 | `/westport/` | **Westport tide times**, and *Is there water at the Point?* (the depth at the swimming steps at Westport Quay) | `tide-swim` |
-| `/westport/tide-times/` | High and low water for the next 30 days | `tide-swim` |
-| `/westport/tide-times/YYYY-MM-DD/` | One day: tides, depth at the steps, a chart, light and moon | `tide-swim` |
+| `/westport/tide-times/` | High and low tide for the next 30 days | `tide-swim` |
+| `/westport/tide-times/tomorrow/` | **High tide Westport tomorrow**: tomorrow's tides, rebuilt daily | `tide-swim` |
+| `/westport/tide-times/YYYY-MM-DD/` | One day (weekday in the title): tides, depth at the steps, a chart, light and moon | `tide-swim` |
+| `/louisburgh/tide-times/` | **Louisburgh tide times**: the Marine Institute's own predictions for Roonagh Pier, 30 days | `tide-times` |
+| `/clew-bay/tide-times/` | **Clew Bay tide times**: a map of the bay's tide spots, what backs each one's times, and honest notes for Murrisk, Newport, Mulranny and Achill Sound | `tide-hub` |
 | `/croagh-patrick/` | **Can I see the Reek today?** Summit cloud, the forecast for the top, the view from it | `mountain` |
 | `/about/` | Sources, licences, privacy, safety | site page |
 
@@ -24,15 +27,19 @@ places/<slug>/app/       optional: files that replace the template app's own (sa
 templates/tide-swim/     index.mjs (page builder), adapter.mjs (values injected into the app),
                          tides.mjs (tide tables; runs at build time and in the browser), tide.css
 templates/mountain/      index.mjs, adapter.mjs, mountain.css
+templates/tide-times/    a tide-times-only page (station mode: a Marine Institute station's own predictions)
+templates/tide-hub/      an area's tide spots on one page with a map (index.mjs, hub.css)
 lib/                     build.mjs (npm run build), prerender.mjs (headless Chromium), html.mjs (head,
                          JSON-LD), seo.mjs (sitemap, robots, the checks), chrome.mjs (footer, sources),
                          app.mjs (copy + minify an app), server.mjs, paths.mjs, scrub.mjs
 pages/site.mjs           home, about, 404
+lib/standalone.mjs       the shell for pages without a lab app
 assets/                  site.css (inlined), tide-client.js, favicon.svg
 vendor/swim, vendor/reek the lab apps' runtime files (index.html, css, js, data), copied by npm run sync
 vendor/fonts             Fraunces and Inter, self-hosted (SIL OFL 1.1), made by npm run fonts
 schemas/                 dip-log.v1.schema.json: the sightings export format
-tools/                   sync, fonts, serve, test, perf, shots
+tools/                   sync, fonts, serve, test, perf, shots; clew-bay-map.mjs (one-off: the hub's base map)
+places/clew-bay/map.*    the hub's base map (relief: EU-DEM; water: OpenStreetMap), made by tools/clew-bay-map.mjs
 .github/workflows/daily.yml   build and deploy to GitHub Pages
 ```
 
@@ -112,6 +119,8 @@ thealmanac.ie {
 
 ## SEO checklist (done, and enforced by the build)
 
+- Pages for what people search: "Westport tide times" (`/westport/`), "high tide Westport tomorrow" (`/westport/tide-times/tomorrow/`, titled with tomorrow's weekday and date), "high tide Westport Saturday" (each day page has its weekday in the title and `h1`), "low tide Westport" ("high and low tide" in every tide title and description), "tide times Louisburgh", "tide times Clew Bay", and Murrisk, Newport and Mulranny as sections of the Clew Bay page. Today, tomorrow and the next days are linked from every tide page.
+- No duplicates: tomorrow's dated page carries `rel=canonical` to `/tomorrow/` and stays out of the sitemap; places without a sourced tidal difference get no page of their own.
 - One topic per URL, each place a path; unique `<title>` (60 characters or so) and meta description per page; one `h1` per page (the swim page gains "Westport tide times"; on the Reek page the question is the `h1` and the one-word answer moved to a `p` with the same look).
 - `<link rel="canonical">`, Open Graph and Twitter tags on every page, with a 1200×630 PNG share image drawn at build time by each app's own code (the swim app's share card, the Reek app's hero) and alt text.
 - Real HTML at build time: the Westport tide tables (today plus 7 days, times, heights, springs and neaps; 30-day and per-day pages), the swim verdict ("As of HH:MM") and every JS-rendered chart, table and paragraph of the swim app; the Reek verdict and forecast ("As of HH:MM"), the 72-hour chart, best spells, the climb card, every one of the 44 names in the view from the top with its card text, and the numbered sources. The deep sections were already static. Checked with JavaScript off.
@@ -150,6 +159,10 @@ Per-spot configuration (the swim app's own files): `data/point.json` (location, 
 
 Injected by `templates/tide-swim/adapter.mjs`: forecast point, sea-temperature cell, hero view direction, the share card's place label, per-place browser storage (so two spots on one site keep separate dip logs and corrections), and `spot`, `model` and `datum` fields in exported dip logs.
 
+### tide-times and tide-hub
+
+`tide-times` (Louisburgh) shows a station's own predictions (`"mode": "station"`: heights above its LAT, as the Marine Institute gives them) from the same fitted constants the swim app uses, with an honesty label next to the times. `tide-hub` (Clew Bay) lists an area's spots from `place.json`, each marked official, sourced or "no published times", over a base map; spots with their own pages are linked and their times shown for today and tomorrow.
+
 ### mountain
 
 `place.json`: summit (position and height), the foot (for fog), the viewpoint the hero skyline is drawn from, the two glow points, names. Injected by `templates/mountain/adapter.mjs`: summit height and position, foot, glow points, viewpoint, the labels that name the mountain, the tab title, per-place forecast cache.
@@ -168,6 +181,18 @@ Still specific to the first instance inside the apps, to move into their data fi
 - Reek app: `nextReekSunday()` and `#nextReek` (the pilgrimage date; another mountain's `index.html` without `#nextReek` would stop the app); the panorama chips' feature ids in `js/app.js`.
 - Both: the export format name `the-point-westport-dips` (kept for the first spot so existing exports still import).
 - A CSS bug worth fixing upstream: in the swim app `.tool .two { display: grid }` overrides `[hidden]`, so the check form showed the height field for every choice; the launch CSS patches it.
+
+### A tide place for somewhere new
+
+Copy `places/louisburgh/` for a Marine Institute station (any of its 38 prediction sites; fit the constants with the swim lab's `tools/fit_tides.mjs` and put `tide_model.json` in `places/<slug>/app/data/`). A place reached from a station needs a **citable** time and height difference (published tidal differences, sailing directions, a model that resolves the place); without one, add it to the hub as a "no published times" spot rather than give it times.
+
+## Tidal differences: what is citable (19 Oct 2026)
+
+- **Westport Quay.** No gauge has measured it. The Admiralty's 1868 *Sailing Directions for the West Coast of Ireland* give high water at full and change 4 h 57 m at Westport and 4 h 38 m at Clare Island (opposite Roonagh): +19 min. The UKHO's EasyTide predictions put Inishgort, at the mouth of Westport Bay, +22 min (high water) and +34 min (low water) behind Roonah Quay. The swim app had used +30/+45, adding an unsourced allowance for the Point lying further in; it now uses **+20/+35**, which moves Westport's times about 10 minutes earlier.
+- **The big tide websites** put Westport's high tide earlier still (Tide Checker 12:36 on 19 Oct, about Roonagh +13 min) but are not evidence: Tide Checker's low tide comes before Roonagh's, at the mouth of the bay, which no source supports, and tide-forecast.com labels its datum "Mean Lower Low Water (Satellite)", a global satellite model.
+- **The Marine Institute's NE Atlantic model** (1.4 km grid, sea-surface height on ERDDAP) shows only +2 to +4 min anywhere in Clew Bay, including Inishgort, where the Admiralty has +22: it doesn't resolve the bay, so it can't supply differences. Its Connemara model stops south of Clew Bay.
+- **Murrisk, Newport, Mulranny, Achill Sound**: no published difference found (the 1868 directions give establishments for Clare Island and Westport only; Airy's 1842 Ordnance Survey tide station in the bay was at Old Head, near Louisburgh). They are on the Clew Bay page as "no published times".
+- **Louisburgh**: Roonagh Pier is the Marine Institute's station, so its page is official.
 
 ## Calibration (ongoing, not a blocker)
 
@@ -207,6 +232,6 @@ Decision: publish with visible caution and let the public calibrate it. On the p
 
 ## Testing (last run on this build)
 
-`npm test`: 35 pages load with a clean console and no failed requests (live forecasts on); the live apps replace the "As of" snapshots; with JavaScript off the Westport page carries the 8-day tide table with times, heights and springs/neaps, the swim app's 7-day depth table, charts, year sentence, 62 sources and the deep sections, and the Reek page its verdict, forecast, 44 view cards, deep sections and sources; a sighting saved through "Tell us where the water was" exports with spot, model and datum; sitemap, robots and JSON-LD (WebSite, WebPage, Place, Mountain, BreadcrumbList) validate; share images are 1200×630 PNGs; both adapters apply to a made-up second place; a second build under `/almanac/` crawls with no broken links; nothing private in the repo or the build. In this headless setup the map's WebGL logs "GPU stall due to ReadPixels" warnings from software rendering; the test sets those aside.
+`npm test`: every page in the sitemap loads with a clean console and no failed requests (live forecasts on); the live apps replace the "As of" snapshots; with JavaScript off the Westport page carries the 8-day tide table with times, heights and springs/neaps, the swim app's 7-day depth table, charts, year sentence, 62 sources and the deep sections, and the Reek page its verdict, forecast, 44 view cards, deep sections and sources; a sighting saved through "Tell us where the water was" exports with spot, model and datum; sitemap, robots and JSON-LD (WebSite, WebPage, Place, Mountain, BreadcrumbList) validate; share images are 1200×630 PNGs; both adapters apply to a made-up second place; a second build under `/almanac/` crawls with no broken links; nothing private in the repo or the build. In this headless setup the map's WebGL logs "GPU stall due to ReadPixels" warnings from software rendering; the test sets those aside.
 
 `npm run shots` writes 390×844 screenshots (with and without JavaScript) to `shots/`.

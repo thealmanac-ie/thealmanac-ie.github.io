@@ -11,7 +11,9 @@
     "group": "Mayo",
     "title": "Croagh Patrick",
     "blurb": "Is the top of the Reek in cloud? A live verdict from three weather models, the next clear spell, and the real view from the summit.",
-    "order": 2
+    "order": 2,
+    "href": "croagh-patrick/",
+    "linkText": "Can I see the Reek today?"
   },
   "seo": {
     "title": "Can I see Croagh Patrick today? Summit cloud and the view from the top",

@@ -60,6 +60,15 @@ export async function prepare(ctx, place) {
 
 const pagePath = (place) => `${place.slug}/`;
 
+// Where each day lives: tomorrow at tide-times/tomorrow/, other days at tide-times/YYYY-MM-DD/.
+export const honesty = (place, info) => place.tide.honestyTpl.replace('{hw}', info.P.diffs.hw_spring_min).replace('{lw}', info.P.diffs.lw_spring_min);
+
+export function dayLinks(place, info) {
+  const base = `${place.slug}/${DAY_BASE}`, tomorrowKey = info.dayKeys[1];
+  const target = (d) => (!info.dayKeys.includes(d.key) ? null : d.key === tomorrowKey ? `${base}tomorrow/` : `${base}${d.key}/`);
+  return { base, tomorrowKey, target, rel: (from, d) => { const t = target(d); return t ? rel(from, t) : null; } };
+}
+
 function pageMeta(ctx, place) {
   return { path: pagePath(place), title: ctx.fullTitle(place.seo.title), ogTitle: place.seo.title, description: place.seo.description, og: { path: `og/${place.slug}.png`, width: 1200, height: 630, alt: `${place.card.title}: the swimming steps at ${place.spot.short} drawn at the predicted water level, with Croagh Patrick behind` } };
 }
@@ -87,15 +96,17 @@ export function html(ctx, place, info, pr) {
   insertAfter(doc, one(doc, 'header#hero'), `<aside class="tellBand" aria-label="Help calibrate this page"><p><b>Every depth here is worked out, not measured (±${S.uncertaintyM} m).</b> At the steps? Say where the water was and this page gets better.</p><a class="btn" href="#tell">Tell us where the water was</a></aside>`);
 
   // ---- tide times, server-rendered, first thing in <main>
-  const blk = T.placeTidesBlock(info.mods, { ...info.opts, model: info.model, P: info.P, from: ctx.now, dayHref: (d) => (info.dayKeys.includes(d.key) ? `${DAY_BASE}${d.key}/` : null) });
+  const L = dayLinks(place, info);
+  const blk = T.placeTidesBlock(info.mods, { ...info.opts, model: info.model, P: info.P, from: ctx.now, dayHref: (d) => L.rel(page.path, d), nav: { day: (d) => L.rel(page.path, d), all: rel(page.path, L.base), allN: info.dayKeys.length } });
   const cdOff = (place.tide.chartDatumBelowMsl - info.P.msl_odm).toFixed(1);
   const dt = info.P.diffs;
+  place.tide.honesty = honesty(place, info);
   const cfg = { builtDay: d0.key, module: rel(page.path, 'assets/tides.mjs'), opts: info.opts, dayKeys: info.dayKeys, dayBase: DAY_BASE };
   insertBefore(doc, doc.querySelector('main').firstElementChild, `<section id="tides">
   ${crumbs(page.path, [{ path: '', label: ctx.site.brand }, { path: page.path, label: place.name }])}
   <h1>${esc(place.seo.h1)}</h1>
   <div id="tidesBlock">${blk.html}</div>
-  <p class="small">Irish time. Heights are metres above or below OD Malin, the Irish land-survey datum, which sits within a few centimetres of mean sea level here; for heights above chart datum, as on Admiralty charts, add about ${cdOff} m. Worked out from ${esc(place.tide.stationLong)} (Marine Institute, CC BY 4.0), shifted to the Quay: high water about ${dt.hw_spring_min} minutes later, low water about ${dt.lw_spring_min}. Weather can push the real tide tens of centimetres either way. ${ctx.site.dayPages ? `<a href="${DAY_BASE}">The next ${ctx.site.dayPages} days</a> · ` : ''}<a href="#dModel">How the tide is worked out</a></p>
+  <p class="small">Irish time. Heights are metres above or below OD Malin, the Irish land-survey datum, which sits within a few centimetres of mean sea level here; for heights above chart datum, as on Admiralty charts, add about ${cdOff} m. ${esc(place.tide.honesty)} Weather can push the real tide tens of centimetres either way. <a href="#dOffset">From Roonagh to the Point</a> · <a href="${rel(page.path, 'clew-bay/tide-times/')}">Elsewhere in Clew Bay</a></p>
   <script type="application/json" id="tidesConfig">${JSON.stringify(cfg).replace(/</g, '\\u003c')}</script>
 </section>`);
 
@@ -206,6 +217,8 @@ function cardMoment(info) {
 }
 function local(util, t) { const p = util.localParts(t), z = (n) => String(n).padStart(2, '0'); return `${p.y}-${z(p.mo)}-${z(p.d)}T${z(p.h)}:${z(p.mi)}`; }
 
+export const provisional = (ctx, place, info) => html(ctx, place, info, null).html;
+
 export function write(ctx, place, info, pr) {
   const { page, html: out } = html(ctx, place, info, pr);
   const dir = path.join(ctx.dist, place.slug);
@@ -219,72 +232,90 @@ export function write(ctx, place, info, pr) {
 
 // ------------------------------------------------------------------ the day pages
 function dayPages(ctx, place, info, pr) {
-  const F = T.fmt(info.mods.util), S = place.spot, P = info.P;
+  const F = T.fmt(info.mods.util), S = place.spot, P = info.P, L = dayLinks(place, info);
   const days = info.days.filter((d) => info.dayKeys.includes(d.key));
   const og = pageMeta(ctx, place).og;
-  const base = `${place.slug}/${DAY_BASE}`;
+  const base = L.base;
   const out = [];
-  const shell = (p, title, desc, crumbItems, bodyHtml, ld) => {
+  const shell = (meta, bodyHtml, ld) => {
     const doc = parse(`<!doctype html><html lang="${ctx.site.lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title></title><meta name="theme-color" content="#0b1622"></head><body class="site"><div class="wrap">${bodyHtml}</div></body></html>`);
-    applyHead(doc, ctx.site, { path: p, title, description: desc, og, ogTitle: title, jsonld: ld }, { after: [`<style>${ctx.css.site}${ctx.css.tide}</style>`] });
+    applyHead(doc, ctx.site, { ...meta, og, ogTitle: meta.ogTitle || meta.title, jsonld: ld }, { after: [`<style>${ctx.css.site}${ctx.css.tide}</style>`] });
     return serialize(doc);
   };
+  const writePage = (meta, body, ld) => { fs.mkdirSync(path.join(ctx.dist, meta.path), { recursive: true }); fs.writeFileSync(path.join(ctx.dist, meta.path, 'index.html'), shell(meta, body, ld)); };
   const crumbsFor = (p, label) => [{ path: '', label: ctx.site.brand }, { path: `${place.slug}/`, label: place.name }, { path: base, label: 'Tide times' }, ...(label ? [{ path: p, label }] : [])];
   const foot = (p) => `<footer>${footer(p, ctx.site, { sources: ['mi-tides', 'osm'], places: ctx.places, safety: `<b>Predictions, not measurements.</b> Weather can move the tide by tens of centimetres. There is no lifeguard at ${esc(S.short)}.` })}</footer>`;
   const cdOff = (place.tide.chartDatumBelowMsl - P.msl_odm).toFixed(1);
+  place.tide.honesty = honesty(place, info);
+  const clip = (t, n = 160) => (t.length > n ? t.slice(0, n - 1).replace(/\s+\S*$/, '') + '…' : t);
+  const nav = (p) => T.dayNav(F, days, { day: (d) => L.rel(p, d), all: rel(p, base), allN: days.length });
 
-  days.forEach((d, i) => {
-    const p = `${base}${d.key}/`, nice = F.long(d.mid);
-    const prev = days[i - 1], next = days[i + 1];
-    const title = `${place.tide.place} tide times, ${nice}`;
-    const desc = `High and low water at ${place.tide.place} on ${nice}: ${T.todaySentence(F, d, info.opts).replace(/\.$/, '')}. With the depth at the swimming steps at ${S.short}.`.slice(0, 300);
-    const meta = { path: p, title: ctx.fullTitle(title), description: desc.length > 158 ? desc.slice(0, 155).replace(/\s+\S*$/, '') + '…' : desc };
-    const crumbItems = crumbsFor(p, F.day(d.mid));
+  // the body of one day (used by the dated page and by "tomorrow")
+  const dayBody = (p, d, h1, lede, crumbItems) => {
+    const nice = F.long(d.mid), i = days.indexOf(d), prev = days[i - 1], next = days[i + 1];
     const chart = pr?.charts?.[d.key] ? pr.charts[d.key].replace('<svg', `<svg role="img" aria-label="Depth of water at the foot of the steps at ${esc(S.short)} through ${esc(nice)}"`) : '';
-    const body = `<main>${crumbs(p, crumbItems)}
-<h1>${esc(title)}</h1>
-<p class="lede">${esc(T.todaySentence(F, d, info.opts))}</p>
+    return `<main>${crumbs(p, crumbItems)}
+<h1>${esc(h1)}</h1>
+<p class="lede">${esc(lede)}</p>
 ${T.dayTable(F, d, { caption: `${place.tide.place}, ${nice}. Heights in metres above OD Malin; "at the steps" is the depth at the foot of the swimming steps at ${S.short}.` })}
-<p class="small">Heights are metres above or below OD Malin (about mean sea level); add about ${cdOff} m for heights above chart datum. Times are Irish time.</p>
+<p class="small">Heights are metres above or below OD Malin (about mean sea level); add about ${cdOff} m for heights above chart datum. Times are Irish time. ${esc(place.tide.honesty)}</p>
+${nav(p)}
 <h2>Water at the steps at ${esc(S.short)}</h2>
 <p>${esc(T.spotSentence(F, d, { ...info.opts }))} Depths are estimates, good to about ±${S.uncertaintyM} m.</p>
 ${chart ? `<figure class="fig">${chart}<figcaption>Depth of water at the foot of the steps through the day (midnight to midnight). Shaded: a metre or more, enough to swim. Grey bands: night and twilight. Dashed lines: wade (${info.constants.levels.wade} m), dip (${info.constants.levels.dip} m) and swim (${info.constants.levels.swim} m).</figcaption></figure>` : ''}
 ${T.windowsList(F, d, { levels: info.constants.levels })}
 <h2>Light and moon</h2>
 <p>${esc(T.lightLine(F, d))}</p>
-<p class="note">For the live picture (the depth right now, wind, chop and water temperature), and how all of this is worked out, see <a href="${rel(p, place.slug + '/')}">${esc(S.question)}</a>. ${esc(place.tide.place)} has no tide gauge: these times come from ${esc(place.tide.stationLong)}, shifted to the Quay.</p>
-<nav class="pager" aria-label="Other days">${prev ? `<a href="${rel(p, `${base}${prev.key}/`)}" rel="prev">← ${esc(F.day(prev.mid))}</a>` : '<span></span>'}<a href="${rel(p, base)}">All ${days.length} days</a>${next ? `<a href="${rel(p, `${base}${next.key}/`)}" rel="next">${esc(F.day(next.mid))} →</a>` : '<span></span>'}</nav></main>
+<p class="note">For the live picture (the depth right now, wind, chop and water temperature), and how all of this is worked out, see <a href="${rel(p, place.slug + '/')}">${esc(S.question)}</a>. Elsewhere in the bay: <a href="${rel(p, 'clew-bay/tide-times/')}">Clew Bay tide times</a>.</p>
+<nav class="pager" aria-label="Other days">${prev ? `<a href="${L.rel(p, prev)}" rel="prev">← ${esc(F.day(prev.mid))}</a>` : '<span></span>'}<a href="${rel(p, base)}">All ${days.length} days</a>${next ? `<a href="${L.rel(p, next)}" rel="next">${esc(F.day(next.mid))} →</a>` : '<span></span>'}</nav></main>
 ${foot(p)}`;
-    const ld = ldPage(ctx.site, meta, { about: place.jsonld, crumbs: crumbItems, modified: ctx.isoDay });
-    fs.mkdirSync(path.join(ctx.dist, p), { recursive: true });
-    fs.writeFileSync(path.join(ctx.dist, p, 'index.html'), shell(p, meta.title, meta.description, crumbItems, body, ld));
+  };
+
+  days.forEach((d) => {
+    const p = `${base}${d.key}/`, nice = F.long(d.mid), times = T.timesSentence(F, d);
+    const isTomorrow = d.key === L.tomorrowKey;
+    const meta = { path: p, title: ctx.fullTitle(`${place.name} tide times ${F.longNoYear(d.mid)}: high and low tide`),
+      description: T.fitDesc([`High tide at ${place.tide.place} on ${nice}: ${times.replace(/^high tide /, '')} (Irish time).`, T.TIDE_SHORT[d.tides], `With the depth at the swimming steps at ${S.short}.`]),
+      // tomorrow's date has its own page, tide-times/tomorrow/: this copy points there
+      ...(isTomorrow ? { canonical: `${base}tomorrow/`, index: false } : {}) };
+    const crumbItems = crumbsFor(p, F.day(d.mid));
+    writePage(meta, dayBody(p, d, `${place.name} tide times, ${nice}`, T.todaySentence(F, d, info.opts), crumbItems), ldPage(ctx.site, meta, { about: place.jsonld, crumbs: crumbItems, modified: ctx.isoDay }));
     out.push({ ...meta, og, lastmod: ctx.isoDay, priority: 0.6 });
   });
 
+  // tomorrow: its own address, for "high tide Westport tomorrow"
+  if (days[1]) {
+    const d = days[1], p = `${base}tomorrow/`, ln = F.longNoYear(d.mid);
+    const shift = T.shiftSentence(F, days[0], d);
+    const meta = { path: p, title: ctx.fullTitle(`High tide ${place.name} tomorrow (${ln}): high and low water`), ogTitle: `High tide ${place.name} tomorrow`,
+      description: T.fitDesc([`Tomorrow, ${ln}, high tide at ${place.tide.place} is at ${d.ext.filter((e) => e.high).map((e) => F.hm(e.t)).join(' and ')} and low tide at ${d.ext.filter((e) => !e.high).map((e) => F.hm(e.t)).join(' and ')} (Irish time).`, T.TIDE_SHORT[d.tides], `About ${shift.replace(/^about /, '')}.`]) };
+    const crumbItems = crumbsFor(p, 'Tomorrow');
+    writePage(meta, dayBody(p, d, `High tide at ${place.name} tomorrow, ${ln}`, `Tomorrow: ${T.todaySentence(F, d, info.opts).replace(/^High/, 'high')} Tomorrow's tides come ${shift}.`, crumbItems), ldPage(ctx.site, meta, { about: place.jsonld, crumbs: crumbItems, modified: ctx.isoDay }));
+    out.push({ ...meta, og, lastmod: ctx.isoDay, priority: 0.8 });
+  }
+
   // the overview: the next N days in one table
-  const p = base, title = `${place.tide.place} tide times: the next ${days.length} days`;
-  const meta = { path: p, title: ctx.fullTitle(title), description: `High and low water at ${place.tide.place} for the next ${days.length} days, with heights, springs and neaps, and a page for each day with the depth at ${S.short}.` };
+  const p = base, title = `${place.name} tide times: high and low tide for the next ${days.length} days`;
+  const meta = { path: p, title: ctx.fullTitle(title), description: `High and low tide at ${place.tide.place} for the next ${days.length} days, with heights, springs and neaps, and a page for each day with the depth at ${S.short}.` };
   const crumbItems = crumbsFor(p);
   const body = `<main>${crumbs(p, crumbItems)}
 <h1>${esc(title)}</h1>
-<p class="lede">Every high and low water at ${esc(place.tide.place)} from ${esc(F.longNoYear(days[0].mid))} to ${esc(F.longNoYear(days[days.length - 1].mid))}, in Irish time. Tap a day for its chart and the depth at the swimming steps.</p>
-${T.weekTable(F, days, { caption: `${place.tide.place}: high and low water, next ${days.length} days. Heights in metres above OD Malin.`, dayHref: (d) => `${d.key}/` })}
-<p class="small">Heights are metres above or below OD Malin (about mean sea level); add about ${cdOff} m for heights above chart datum. From ${esc(place.tide.stationLong)}, shifted to the Quay. Predictions, not measurements: weather can move the tide by tens of centimetres.</p>
-<p><a href="${rel(p, place.slug + '/')}">${esc(S.question)} The live page →</a></p></main>
+<p class="lede">Every high and low tide at ${esc(place.tide.place)} from ${esc(F.longNoYear(days[0].mid))} to ${esc(F.longNoYear(days[days.length - 1].mid))}, in Irish time. Tap a day for its chart and the depth at the swimming steps.</p>
+${nav(p)}
+${T.weekTable(F, days, { caption: `${place.tide.place}: high and low tide, next ${days.length} days. Heights in metres above OD Malin.`, dayHref: (d) => L.rel(p, d) })}
+<p class="small">Heights are metres above or below OD Malin (about mean sea level); add about ${cdOff} m for heights above chart datum. ${esc(place.tide.honesty)} Predictions, not measurements: weather can move the tide by tens of centimetres.</p>
+<p><a href="${rel(p, place.slug + '/')}">${esc(S.question)} The live page →</a> · <a href="${rel(p, 'clew-bay/tide-times/')}">Clew Bay tide times</a></p></main>
 ${foot(p)}`;
-  const ld = ldPage(ctx.site, meta, { about: place.jsonld, crumbs: crumbItems, modified: ctx.isoDay });
-  fs.mkdirSync(path.join(ctx.dist, p), { recursive: true });
-  fs.writeFileSync(path.join(ctx.dist, p, 'index.html'), shell(p, meta.title, meta.description, crumbItems, body, ld));
+  writePage(meta, body, ldPage(ctx.site, meta, { about: place.jsonld, crumbs: crumbItems, modified: ctx.isoDay }));
   out.push({ ...meta, og, lastmod: ctx.isoDay, priority: 0.7 });
   return out;
 }
-
 
 // a one-line "now" for the home page
 export function teaser(ctx, place, info) {
   const F = T.fmt(info.mods.util), d = info.days[0];
   const hws = d.ext.filter((e) => e.high).map((e) => F.hm(e.t));
-  return `Today: high water ${hws.join(' and ')}. ${T.spotSentence(F, d, info.opts)}`;
+  return `Today: high tide ${hws.join(' and ')}. ${T.spotSentence(F, d, info.opts)}`;
 }
 
 export const css = () => fs.readFileSync(path.join(HERE, 'tide.css'), 'utf8');

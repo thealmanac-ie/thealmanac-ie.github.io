@@ -10,7 +10,8 @@ if (el) {
       const mods = await T.loadModules(new URL('js/', location.href).href);
       const get = (f) => fetch(f).then((r) => { if (!r.ok) throw new Error(f); return r.json(); });
       const [model, P] = await Promise.all([get('data/tide_model.json'), get('data/point.json')]);
-      const r = T.placeTidesBlock(mods, { ...c.opts, model, P, from: Date.now(), dayHref: (d) => (c.dayKeys.includes(d.key) ? `${c.dayBase}${d.key}/` : null) });
+      const day = (d) => (c.dayKeys.includes(d.key) ? `${c.dayBase}${d.key}/` : null);
+      const r = T.placeTidesBlock(mods, { ...c.opts, model, P, from: Date.now(), dayHref: day, nav: { day, all: c.dayBase, allN: c.dayKeys.length } });
       document.getElementById('tidesBlock').innerHTML = r.html;
     } catch (e) { console.info('tide tables: kept the built copy', e.message); }
   }

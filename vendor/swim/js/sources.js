@@ -71,7 +71,7 @@ export const SOURCES = {
   nasaslr: `NASA Sea Level Change Team, Sea Level Projection Tool (IPCC AR6), grid cell 53° N, 10° W: total relative sea-level change against 1995–2014, medium confidence, SSP1-2.6 and SSP5-8.5 (median and 17–83% likely range), including vertical land motion. ${A('https://sealevel.nasa.gov/ipcc-ar6-sea-level-projection-tool?lat=53&lon=-10&data_layer=scenario')}`,
   ar6: `B. Fox-Kemper et al. (2021), "Ocean, Cryosphere and Sea Level Change", ch. 9 in <i>Climate Change 2021: The Physical Science Basis</i> (IPCC AR6 WG1); G. G. Garner et al. (2021), IPCC AR6 Sea Level Projections, doi:10.5281/zenodo.5914709. ${A('https://www.ipcc.ch/report/ar6/wg1/chapter/chapter-9/')}`,
   cfram: `Office of Public Works, CFRAM Programme (Western CFRAM study), coastal flood maps for Westport Quay: 10% and 0.5% AEP today, and 0.5% AEP in the High-End Future Scenario. CC BY-NC-ND 4.0, so linked here rather than reproduced. ${A('https://www.floodinfo.ie/map/floodmaps/')}`,
-  reek: `Skyline of Croagh Patrick from Westport Quay, computed by the Croagh Patrick page from AWS Terrain Tiles / EU-DEM ("produced using Copernicus data and information funded by the European Union").`,
+  reek: `Skyline of Croagh Patrick from Westport Quay, computed for the Croagh Patrick page from AWS Terrain Tiles / EU-DEM ("produced using Copernicus data and information funded by the European Union").`,
 };
 
 export function renderSources(ol) {

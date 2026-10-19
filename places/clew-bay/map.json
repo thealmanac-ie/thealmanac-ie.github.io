@@ -1,0 +1,11 @@
+{
+ "about": "Clew Bay base map: relief from AWS Terrain Tiles (EU-DEM), zoom 11, with our hillshade; water from OpenStreetMap (© OpenStreetMap contributors, ODbL). Web Mercator; bounds are [west, south, east, north].",
+ "bounds": [
+  -10.06,
+  53.72,
+  -9.44,
+  53.98
+ ],
+ "width": 760,
+ "height": 540
+}

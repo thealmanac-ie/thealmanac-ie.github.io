@@ -150,6 +150,26 @@ const noJs = async (p) => { const page = await ctxNo.newPage(); await page.goto(
   ok(d.querySelectorAll('table.tt.day tbody tr').length >= 3 && d.querySelector('figure svg path'), `${day}: day table and chart in the HTML`);
   const { html: h2 } = await noJs('westport/tide-times/');
   ok(parseHTML(h2).document.querySelectorAll('table.tt.week tbody tr').length === siteConfig.dayPages, 'tide-times overview: one row per day');
+  // tomorrow has its own page; the dated copy of tomorrow points search engines at it
+  const { html: h3 } = await noJs('westport/tide-times/tomorrow/');
+  const dt = parseHTML(h3).document;
+  ok(/^High tide Westport tomorrow \(\w+day \d+ \w+\)/.test(dt.querySelector('title').textContent) && dt.querySelectorAll('table.tt.day tbody tr').length >= 3, 'tomorrow page: title and table');
+  const tomorrowKey = [...h2.matchAll(/href="(\d{4}-\d\d-\d\d)\/"/g)].map((m) => m[1])[0];
+  const days = fs.readdirSync(path.join(DIST, 'westport/tide-times')).filter((d) => /^\d{4}-/.test(d)).sort();
+  const { html: h4 } = await noJs(`westport/tide-times/${days[1]}/`);
+  ok(parseHTML(h4).document.querySelector('link[rel="canonical"]').getAttribute('href') === BASE + 'westport/tide-times/tomorrow/', "tomorrow's dated page: canonical is the tomorrow page");
+  ok(!locs.includes(BASE + `westport/tide-times/${days[1]}/`) && locs.includes(BASE + 'westport/tide-times/tomorrow/'), 'sitemap: tomorrow page in, its dated copy out');
+  ok(/\w+day/.test(parseHTML(h4).document.querySelector('h1').textContent), 'day pages: weekday in the h1');
+  void tomorrowKey;
+  // Louisburgh: the station's own predictions, labelled as official, 8 + 30 days
+  const { html: h5 } = await noJs('louisburgh/tide-times/');
+  const dl = parseHTML(h5).document;
+  ok(/Official\./.test(dl.querySelector('.note')?.textContent || '') && dl.querySelectorAll('table.tt.week').length === 2 && dl.querySelectorAll('table.tt.week')[1].querySelectorAll('tbody tr').length === 30 && dl.querySelector('figure svg path'), 'louisburgh: official label, week and 30-day tables, tide curve');
+  // the Clew Bay hub: a map linking the spots, and a note for every spot without published times
+  const { html: h6 } = await noJs('clew-bay/tide-times/');
+  const dh = parseHTML(h6).document;
+  ok(dh.querySelectorAll('.hubmap svg a').length >= 6 && ['murrisk', 'newport', 'mulranny', 'achill-sound'].every((id) => dh.querySelector(`#${id} .kind-none`)) && dh.querySelectorAll('table.tt.hub tbody tr').length >= 4, 'clew-bay: map links, spot notes, today/tomorrow table');
+  console.log(`  tomorrow page ok; ${days[1]} canonical -> tomorrow; louisburgh ${dl.querySelectorAll('table.tt.week')[1].querySelectorAll('tbody tr').length} days; hub ${dh.querySelectorAll('.hubmap svg a').length} map links`);
 }
 await ctxNo.close();
 
@@ -175,7 +195,7 @@ for (const loc of locs) {
     ok(b.toString('ascii', 1, 4) === 'PNG' && b.readUInt32BE(16) === 1200 && b.readUInt32BE(20) === 630 && b.length < 600 * 1024, `${loc}: ${k} must be a 1200x630 PNG under 600 KB`);
   }
 }
-ok(['WebSite', 'WebPage', 'BreadcrumbList', 'Place', 'Mountain'].every((t) => types.has(t)), `JSON-LD types seen: ${[...types].join(', ')}`);
+ok(['WebSite', 'WebPage', 'BreadcrumbList', 'Place', 'Mountain', 'BodyOfWater'].every((t) => types.has(t)), `JSON-LD types seen: ${[...types].join(', ')}`);
 for (const f of fs.readdirSync(path.join(DIST, 'og'))) console.log(`  og/${f}: ${(fs.statSync(path.join(DIST, 'og', f)).size / 1024).toFixed(0)} KB`);
 console.log(`  JSON-LD types: ${[...types].join(', ')}`);
 

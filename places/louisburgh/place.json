@@ -1,0 +1,65 @@
+{
+  "about": "Louisburgh, Co. Mayo: tide times for Roonagh Pier, the Marine Institute's tide gauge at the mouth of Clew Bay, 6 km west of the town. Template: tide-times, station mode (the gauge's own predictions, from the swim app's fitted constants for Roonagh).",
+  "slug": "louisburgh",
+  "template": "tide-times",
+  "app": "swim",
+  "name": "Louisburgh",
+  "area": "County Mayo",
+  "listing": {
+    "group": "Mayo",
+    "order": 3,
+    "title": "Louisburgh",
+    "href": "louisburgh/tide-times/",
+    "linkText": "Louisburgh tide times",
+    "blurb": "High and low tide at Roonagh Pier, the Marine Institute's tide gauge for Clew Bay: today, the week and 30 days ahead."
+  },
+  "seo": {
+    "title": "Louisburgh tide times: high and low tide at Roonagh Pier",
+    "h1": "Louisburgh tide times",
+    "description": "High and low tide at Roonagh Pier, Louisburgh, today and for 30 days: the Marine Institute's predictions for its Clew Bay tide gauge, with heights, springs and neaps."
+  },
+  "tide": {
+    "place": "Roonagh Pier",
+    "mode": "station",
+    "label": "Official.",
+    "honesty": "These are the Marine Institute's own predictions for its tide gauge at Roonagh Pier, 6 km west of Louisburgh, computed here from constants fitted to them (within about 2 minutes and 2 cm). Heights are metres above Lowest Astronomical Tide, the Marine Institute's datum for Roonagh."
+  },
+  "location": {
+    "lat": 53.76235,
+    "lon": -9.90442,
+    "source": "Marine Institute station list (ERDDAP imiTidePrediction)"
+  },
+  "card": {
+    "title": "Louisburgh tide times",
+    "subtitle": "High and low tide at Roonagh Pier",
+    "ax": 0.0,
+    "anchor": 0.6
+  },
+  "jsonld": {
+    "@type": "Place",
+    "name": "Roonagh Pier",
+    "containedInPlace": {
+      "@type": "Place",
+      "name": "Louisburgh, County Mayo"
+    },
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Louisburgh",
+      "addressRegion": "County Mayo",
+      "addressCountry": "IE"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 53.76235,
+      "longitude": -9.90442
+    }
+  },
+  "attribution": [
+    "mi-tides"
+  ],
+  "related": [
+    "clew-bay",
+    "westport",
+    "croagh-patrick"
+  ]
+}

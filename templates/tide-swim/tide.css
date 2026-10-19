@@ -23,3 +23,6 @@ table.tt.week tr.today th, table.tt.week tr.today td { background: #fff; }
 #tell [hidden] { display: none !important; } /* the lab's .tool .two {display:grid} overrides [hidden] */
 .windows.lw li { display: grid; grid-template-columns: 7.5em 1fr; gap: 8px; }
 .windows.lw li .meta { text-align: left; }
+.daynav { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 4px; }
+.daynav a, .daynav span { border: 1px solid var(--line, #d6cbb9); background: #fff; border-radius: 999px; padding: 6px 11px; font-size: 14px; font-weight: 600; text-decoration: none; color: var(--ink, #0f1d26); }
+.daynav .small { font-weight: 400; }

@@ -25,15 +25,15 @@
  "msl_odm": 0.06,
  "msl_note": "Mean sea level relative to OD Malin at the Marine Institute gauges either side of Clew Bay: Galway +0.029, Inishmore +0.045, Ballyglass +0.066, Sligo +0.081 (data.gov.ie gauge metadata). Roonagh's own figure (+0.376) is an outlier and is not used.",
  "diffs": {
-  "hw_spring_min": 30,
-  "hw_neap_min": 30,
-  "lw_spring_min": 45,
-  "lw_neap_min": 45,
+  "hw_spring_min": 20,
+  "hw_neap_min": 20,
+  "lw_spring_min": 35,
+  "lw_neap_min": 35,
   "mhws": 0.1,
   "mhwn": 0.0,
   "mlwn": 0.0,
   "mlws": -0.1,
-  "note": "Point minus Roonagh. Times: Inishgort is +22 min (HW) and +34 min (LW) after Roonah Quay in UKHO EasyTide; the 1868 Admiralty directions put Westport HW 19 min after Clare Island; the Point is further in than Inishgort, so we add a little. Heights: the 1868 Admiralty figures give Westport springs 0.5 ft (0.15 m) bigger than Clare Island and neaps the same."
+  "note": "Point minus Roonagh. Times (changed 19 Oct 2026 from +30/+45, which added an unsourced allowance for the Point lying further in than Inishgort): the 1868 Admiralty Sailing Directions put high water at Westport 19 min after Clare Island (HW full and change 4 h 57 m vs 4 h 38 m; Clare Island sits across the sound from Roonagh); UKHO EasyTide has Inishgort +22 min (HW) and +34 min (LW) after Roonah Quay. No published figure puts the Quay later than that, so HW +20 min, LW +35 min. Heights: the 1868 figures give Westport springs 0.5 ft (0.15 m) bigger than Clare Island and neaps the same."
  },
  "bay_bed_odm": -1.1,
  "bay_bed_note": "Only for the picture: the level at which the hero shows the bay as drained, from the Admiralty chart's 1.4 m drying height just west of the Point (MWP 2017), about -1.1 m OD Malin."

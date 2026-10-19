@@ -9,20 +9,23 @@
     "group": "Mayo",
     "title": "Westport",
     "blurb": "Tide times for Westport Quay, and how deep the water is at the swimming steps at the Point, now and for the week.",
-    "order": 1
+    "order": 1,
+    "href": "westport/",
+    "linkText": "Westport tide times"
   },
   "seo": {
-    "title": "Westport tide times: high and low water at Westport Quay",
+    "title": "Westport tide times today: high and low tide at Westport Quay",
     "h1": "Westport tide times",
     "kicker": "Westport Quay, Co. Mayo",
-    "description": "High and low water at Westport Quay today and for the next week, with heights, springs and neaps, and how deep the water is at the swimming steps at the Point."
+    "description": "High and low tide at Westport Quay today and for the next week, with heights, springs and neaps, and how deep the water is at the swimming steps at the Point."
   },
   "tide": {
     "place": "Westport Quay",
     "station": "Roonagh",
     "stationLong": "the Marine Institute's predictions for Roonagh Pier, at the mouth of Clew Bay",
     "chartDatumBelowMsl": 2.6,
-    "chartDatumNote": "the gap between mean sea level and chart datum in the Admiralty predictions for Inishgort (see 'How deep is it at the steps, really?')"
+    "chartDatumNote": "the gap between mean sea level and chart datum in the Admiralty predictions for Inishgort (see 'How deep is it at the steps, really?')",
+    "honestyTpl": "Worked out from the Marine Institute's predictions for Roonagh Pier, at the mouth of Clew Bay, shifted to the Quay: high tide about {hw} minutes later, low tide about {lw} minutes later, from the Admiralty's 1868 Sailing Directions and its modern predictions for Inishgort. No tide gauge has measured the Quay itself."
   },
   "spot": {
     "id": "the-point",

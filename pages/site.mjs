@@ -23,7 +23,7 @@ export function home(ctx, cards) {
     og: { path: 'og/home.png', width: 1200, height: 630, alt: `${ctx.site.brand}: Croagh Patrick's skyline from Westport Quay` } };
   page.jsonld = [ldWebsite(ctx.site), ...ldPage(ctx.site, page, { modified: ctx.isoDay })];
   const groups = [...new Set(cards.map((c) => c.place.listing.group))];
-  const list = groups.map((g) => `<p class="group">${esc(g)}</p><ul class="places-list">${cards.filter((c) => c.place.listing.group === g).map((c) => `<li><a class="place" href="${rel(p, c.place.slug + '/')}"><img src="${rel(p, `og/${c.place.slug}-thumb.webp`)}" alt="${esc(c.alt)}" width="600" height="315" loading="lazy" decoding="async"><span class="txt"><b>${esc(c.place.listing.title)}</b><span class="q">${esc(c.question)}</span>${esc(c.place.listing.blurb)}${c.now ? `<span class="now">${esc(c.now)}</span>` : ''}</span></a></li>`).join('')}</ul>`).join('');
+  const list = groups.map((g) => `<p class="group">${esc(g)}</p><ul class="places-list">${cards.filter((c) => c.place.listing.group === g).map((c) => `<li><a class="place" href="${rel(p, c.place.listing.href)}"><img src="${rel(p, `og/${c.place.slug}-thumb.webp`)}" alt="${esc(c.alt)}" width="600" height="315" loading="lazy" decoding="async"><span class="txt"><b>${esc(c.place.listing.title)}</b><span class="q">${esc(c.question)}</span>${esc(c.place.listing.blurb)}${c.now ? `<span class="now">${esc(c.now)}</span>` : ''}</span></a></li>`).join('')}</ul>`).join('');
   const verify = [ctx.site.verification?.google && `<meta name="google-site-verification" content="${esc(ctx.site.verification.google)}">`, ctx.site.verification?.bing && `<meta name="msvalidate.01" content="${esc(ctx.site.verification.bing)}">`].filter(Boolean);
   const body = `${topBar(ctx, p)}
 <main>
@@ -75,7 +75,7 @@ ${ctx.site.repoUrl ? `<p class="small">Source code: <a href="${esc(ctx.site.repo
 // 404.html is served for any missing path, at any depth, so its links are absolute (base path).
 export function notFound(ctx) {
   const b = basePath(ctx.site.baseUrl);
-  const links = ctx.places.map((pl) => `<li><a href="${b}${pl.slug}/">${esc(pl.listing.title)}</a></li>`).join('');
+  const links = ctx.places.map((pl) => `<li><a href="${b}${pl.listing.href}">${esc(pl.listing.linkText)}</a></li>`).join('');
   const body = `<header class="top"><a class="brand" href="${b}">${esc(ctx.site.brand)}</a></header>
 <main><h1>Not here</h1>
 <p class="lede">That page doesn't exist, or no longer does. The day-by-day tide pages only run ${ctx.site.dayPages} days ahead, and each day's page is dropped once the day is over.</p>

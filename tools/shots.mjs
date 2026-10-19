@@ -29,6 +29,12 @@ const SHOTS = [
   ['13-croagh-patrick-view-list', 'croagh-patrick/', { scrollTo: '.viewlist', open: '.viewlist' }],
   ['14-croagh-patrick-deep', 'croagh-patrick/', { scrollTo: '#deep' }],
   ['15-about', 'about/', {}],
+  ['17-westport-tomorrow', 'westport/tide-times/tomorrow/', {}],
+  ['18-louisburgh', 'louisburgh/tide-times/', {}],
+  ['19-louisburgh-curve', 'louisburgh/tide-times/', { scrollTo: 'figure' }],
+  ['25-clew-bay', 'clew-bay/tide-times/', {}],
+  ['26-clew-bay-spots', 'clew-bay/tide-times/', { scrollTo: '#murrisk' }],
+  ['27-westport-share-sheet', 'westport/', { click: '#shareBtn' }],
   ['16-not-found', 'westport/tide-times/1999-01-01/', {}],
   ['20-nojs-westport-top', 'westport/', { js: false }],
   ['21-nojs-westport-tide-times', 'westport/', { js: false, scrollTo: '#tides' }],
@@ -46,6 +52,7 @@ for (const [name, p, o] of SHOTS) {
   await page.goto(server.url + p, { waitUntil: 'load' });
   if (o.js !== false) await page.waitForTimeout(p.startsWith('croagh') ? 2500 : 1200);
   if (o.open) await page.evaluate((s) => { const d = document.querySelector(s); if (d) d.open = true; }, o.open);
+  if (o.click) { await page.click(o.click); await page.waitForTimeout(600); }
   if (o.scrollTo) await page.evaluate((s) => { const e = document.querySelector(s); if (e) window.scrollTo({ top: e.getBoundingClientRect().top + window.scrollY - 8, behavior: 'instant' }); }, o.scrollTo);
   await page.waitForTimeout(300);
   await page.screenshot({ path: path.join(OUT, `${name}.png`) });

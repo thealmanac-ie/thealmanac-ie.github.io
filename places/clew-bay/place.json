@@ -1,0 +1,109 @@
+{
+  "about": "Clew Bay: one page for every tide spot in the bay, labelled for what backs its times. Template: tide-hub. The base map is made by tools/clew-bay-map.mjs (map.webp, map.json).",
+  "slug": "clew-bay",
+  "template": "tide-hub",
+  "name": "Clew Bay",
+  "area": "County Mayo",
+  "listing": {
+    "group": "Mayo",
+    "order": 4,
+    "title": "Clew Bay",
+    "href": "clew-bay/tide-times/",
+    "linkText": "Clew Bay tide times",
+    "blurb": "Tide times around the bay, and which ones anyone has actually published: Louisburgh, Westport, Murrisk, Newport, Mulranny."
+  },
+  "seo": {
+    "title": "Clew Bay tide times: Louisburgh, Westport, Murrisk, Newport, Mulranny",
+    "h1": "Clew Bay tide times",
+    "description": "Tide times around Clew Bay: official at Roonagh Pier (Louisburgh), from published figures for Westport Quay, and honest notes for Murrisk, Newport and Mulranny."
+  },
+  "intro": "There is one official tide prediction in Clew Bay: the Marine Institute's, for its gauge at Roonagh Pier at the mouth of the bay. Everywhere else is worked out from it, where someone has published how far behind it runs. Where nobody has, we say so instead of guessing.",
+  "spots": [
+    {
+      "id": "louisburgh",
+      "name": "Roonagh Pier (Louisburgh)",
+      "short": "Roonagh Pier",
+      "lat": 53.76235,
+      "lon": -9.90442,
+      "kind": "official",
+      "place": "louisburgh",
+      "note": "The Marine Institute's tide gauge for Clew Bay, 6 km west of Louisburgh. Its predictions are the only official ones in the bay; ours are computed from constants fitted to them, within about 2 minutes and 2 cm."
+    },
+    {
+      "id": "westport",
+      "name": "Westport Quay (the Point)",
+      "short": "Westport Quay",
+      "lat": 53.8024,
+      "lon": -9.5603,
+      "kind": "sourced",
+      "place": "westport",
+      "note": "No gauge at the Quay. Its times are Roonagh's, shifted: high tide about 20 minutes later and low tide about 35 minutes later. The evidence: the Admiralty's 1868 Sailing Directions put high water at Westport 19 minutes after Clare Island, across the sound from Roonagh, and the Admiralty's modern predictions for Inishgort, at the mouth of Westport Bay, run 22 minutes behind Roonagh at high water and 34 at low water."
+    },
+    {
+      "id": "murrisk",
+      "name": "Murrisk",
+      "lat": 53.783,
+      "lon": -9.638,
+      "kind": "none",
+      "note": "No published prediction or tidal difference. Murrisk is on the south shore between Roonagh Pier and Westport Quay, so its tides should come between theirs. We would rather say that than make up a number."
+    },
+    {
+      "id": "newport",
+      "name": "Newport",
+      "lat": 53.8846,
+      "lon": -9.5468,
+      "kind": "none",
+      "note": "No published tidal difference. Newport sits at the head of its own arm of the bay; the 1868 Sailing Directions say small vessels can reach Newport quay with 12 feet of water at high water springs, but give no times. Westport Quay's times are the nearest sourced ones."
+    },
+    {
+      "id": "mulranny",
+      "name": "Mulranny",
+      "lat": 53.9036,
+      "lon": -9.781,
+      "kind": "none",
+      "note": "No published tidal difference for Mulranny, on the bay's north shore, so no times here."
+    },
+    {
+      "id": "achill-sound",
+      "name": "Achill Sound",
+      "lat": 53.9323,
+      "lon": -9.9265,
+      "kind": "none",
+      "note": "Not covered. Achill Sound joins Clew Bay to Blacksod Bay, so its tide is fed from both ends, and we found no published times for it."
+    }
+  ],
+  "peak": {
+    "name": "Croagh Patrick",
+    "lat": 53.76,
+    "lon": -9.6601,
+    "href": "croagh-patrick/"
+  },
+  "footnote": "Why other tide websites can differ: some put Westport's high tide several minutes earlier than ours, and their low tides differ by more. One says its predictions come from a global satellite tide model; another has Westport's low tide coming before Roonagh's, at the mouth of the bay, which nothing published supports. We follow the published Admiralty figures, and sightings from the steps at the Point are how we will check them.",
+  "card": {
+    "title": "Clew Bay tide times",
+    "subtitle": "Official, sourced, and honestly unknown"
+  },
+  "jsonld": {
+    "@type": "BodyOfWater",
+    "name": "Clew Bay",
+    "address": {
+      "@type": "PostalAddress",
+      "addressRegion": "County Mayo",
+      "addressCountry": "IE"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 53.83,
+      "longitude": -9.75
+    }
+  },
+  "attribution": [
+    "mi-tides",
+    "osm",
+    "eudem"
+  ],
+  "related": [
+    "louisburgh",
+    "westport"
+  ]
+}

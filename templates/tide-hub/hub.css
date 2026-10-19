@@ -1,0 +1,15 @@
+/* The tide hub: a map with linked spots, a today/tomorrow table, spot notes (inlined at build). */
+.hubmap .mapbox { position: relative; border-radius: 8px; overflow: hidden; }
+.hubmap .mapbox img { display: block; width: 100%; height: auto; }
+.hubmap .mapbox svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.hubmap .mapbox a text { text-decoration: none; }
+.hubmap .k { display: inline-block; width: 10px; height: 10px; border-radius: 50%; vertical-align: -1px; border: 2px solid #5a6b76; }
+.hubmap .k-official { background: #0f1d26; border-color: #0f1d26; } .hubmap .k-sourced { background: #2a7fb8; border-color: #2a7fb8; } .hubmap .k-none { background: #fff; }
+table.tt.hub tr.sec th { background: #ebe3d6; font-size: 13px; letter-spacing: .04em; }
+.spot { border-top: 1px solid #d6cbb9; padding-top: 4px; }
+.spot h3 { margin-top: 14px; }
+.spot .kind { display: inline-block; font: 600 11px/1.2 system-ui, sans-serif; letter-spacing: .06em; text-transform: uppercase; padding: 3px 7px; border-radius: 6px; vertical-align: 3px; margin-left: 4px; }
+.kind-official { background: #0f1d26; color: #fff; } .kind-sourced { background: #2a7fb8; color: #fff; } .kind-none { background: #ebe3d6; color: #2c4150; }
+.daynav { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 4px; }
+.daynav a, .daynav span { border: 1px solid #d6cbb9; background: #fff; border-radius: 999px; padding: 6px 11px; font-size: 14px; font-weight: 600; text-decoration: none; color: #0f1d26; }
+.daynav .small { font-weight: 400; color: #2c4150; }

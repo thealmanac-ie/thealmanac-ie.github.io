@@ -81,7 +81,7 @@
 </section>
 
 <section id="dips">
-  <p class="kicker">Yours, on this phone</p>
+  <p class="kicker">Kept in your browser, not sent anywhere</p>
   <h2>Your dips</h2>
   <p>Tap <b>I'm in</b> at the top when you're in the water. The page notes the time and its own numbers for that moment: the tide, the depth at the steps, the water temperature, the wind and the chop. If you tell it where the water was on the steps, that sighting also checks the prediction. Everything stays in this browser. Nothing is posted anywhere.</p>
   <div class="stats" id="dipStats"></div>
@@ -90,7 +90,7 @@
   <ul class="dipList" id="dipList"></ul>
   <div class="calib" id="calib"></div>
   <div class="filebtns"><button class="btn ghost" id="exportBtn">Export my log (.json)</button><label class="btn ghost" for="importFile">Import a log file</label><input type="file" id="importFile" accept="application/json,.json"></div>
-  <p class="small">To pool sightings with the group, export your log and send the file to whoever is collecting them, by WhatsApp or email. They import it here, and it merges with their own log, skipping duplicates. There's no server; the file is the only copy that leaves your phone, and only if you send it.</p>
+  <p class="small">To share your sightings, export your log and send the file on, by message or email. Whoever gets it can import it here, and it merges with their own log, skipping duplicates. There's no server: the file only leaves your device if you send it.</p>
 </section>
 
 <section id="springs">
@@ -109,7 +109,7 @@
   <p class="kicker">For the diary</p>
   <h2>Tide times at the Point</h2>
   <table class="tt" id="tideTable"><thead><tr><th>Day</th><th>High water<br><span class="small">depth at the steps</span></th><th>Low water</th></tr></thead><tbody></tbody></table>
-  <p class="small">Irish time. These are our estimates for the Point, about half an hour after Roonagh (see "From Roonagh to the Point"). "Dry" means low water leaves the foot of the steps out of the water.</p>
+  <p class="small">Irish time. These are our estimates for the Point, about 20 minutes after Roonagh at high water (see "From Roonagh to the Point"). "Dry" means low water leaves the foot of the steps out of the water.</p>
 </section>
 
 <section id="futureSec">
@@ -129,7 +129,7 @@
 </section>
 
 <section id="deep">
-  <p class="kicker">For the regulars</p>
+  <p class="kicker">The workings</p>
   <h2>How it's worked out, and what we don't know</h2>
   <p>Everything above is a sum: <b>water level minus the height of the seabed at the foot of the steps</b>. Both halves have to be on the same vertical datum, and neither is measured at the Point itself. Here is how each half is done, where it could be wrong, and how to tell us.</p>
 
@@ -142,7 +142,7 @@
 <figcaption>Every level on this page on one scale, in metres OD Malin. The blue band is the Point's range from mean low water springs to mean high water springs. Dashed lines are other people's datums, explained below.</figcaption></figure>
 <h3>Mean sea level, and the Roonagh puzzle</h3>
 <p>Tide predictions give heights above a local "lowest astronomical tide", and every gauge's LAT is its own. To get from tide heights to OD Malin, we only need to know where mean sea level sits on OD Malin. The Marine Institute's own gauges either side of Clew Bay agree closely: Galway +0.03 m, Inishmore +0.05 m, Ballyglass +0.07 m, Sligo +0.08 m<a class="cite" href="#s-intgn">intgn</a>. We use <b>+<span id="nMSL">0.06</span> m</b>.</p>
-<p>The Roonagh gauge, the one the tide comes from, reports its own mean sea level at <b>+0.376 m</b>, with its LAT at −1.955 m<a class="cite" href="#s-roonagh">roonagh</a>. That is about 0.3 m above every neighbour, and the Marine Institute calls Roonagh "one of the most challenging sites of the entire collection to measure sea level". It also warns that "unresolved offset issues" are possible across the network. So we don't use Roonagh's datum, only the shape and timing of its tide. If Roonagh's figure turns out to be the right one, every depth on this page is about 0.3 m too low, and there'd be more water than we say. INFOMAR's charts use yet another LAT, from the UK Hydrographic Office's VORF model<a class="cite" href="#s-infomar">infomar</a>. Comparing INFOMAR's land heights with the OPW survey, that LAT comes out about 2.6–2.8 m below OD Malin around Westport (our comparison, tools/analyse_seabed.mjs).</p>
+<p>The Roonagh gauge, the one the tide comes from, reports its own mean sea level at <b>+0.376 m</b>, with its LAT at −1.955 m<a class="cite" href="#s-roonagh">roonagh</a>. That is about 0.3 m above every neighbour, and the Marine Institute calls Roonagh "one of the most challenging sites of the entire collection to measure sea level". It also warns that "unresolved offset issues" are possible across the network. So we don't use Roonagh's datum, only the shape and timing of its tide. If Roonagh's figure turns out to be the right one, every depth on this page is about 0.3 m too low, and there'd be more water than we say. INFOMAR's charts use yet another LAT, from the UK Hydrographic Office's VORF model<a class="cite" href="#s-infomar">infomar</a>. Comparing INFOMAR's land heights with the OPW survey, that LAT comes out about 2.6–2.8 m below OD Malin around Westport (our comparison of the two surveys).</p>
 </div></details>
   <details id="dOffset"><summary>From Roonagh to the Point</summary><div id="dOffsetBody">
 <p>There is no tide gauge in Westport Bay and no official prediction for Westport. The Marine Institute predicts 38 places around Ireland. The nearest is the gauge on Roonagh pier, at the mouth of Clew Bay, 23 km west of the Point<a class="cite" href="#s-erddap">erddap</a>. The tide takes time to work its way in past the islands and up the channel, so we shift each Roonagh high and low water to the Point. This is the old secondary-port method sailors use, with Roonagh's own curve filling in between. What we have to go on:</p>
@@ -152,7 +152,7 @@
   <dt>1837 / 1912</dt><dd>Lewis has spring tides rising 14 ft at the quays<a class="cite" href="#s-lewis">lewis</a>. A botanist on the Clare Island Survey gives "about 15 feet" of spring rise and fall at Westport Quay, and adds that "On Clare Island the range is, if anything, greater"<a class="cite" href="#s-cotton">cotton</a>.</dd>
   <dt>2016</dt><dd>The Council's engineers drew the new slipway and pontoon with tide levels "From Admiralty Tide Tables For Inishgort": MHWS +1.8, MHWN +0.8, MLWN −0.8 and MLWS −1.8 m OD Malin<a class="cite" href="#s-mwp16">mwp16</a>. One sheet of the same set says +2.3 m for MHWS.</dd>
 </dl>
-<p>So the page puts <b>high water <span id="nDtHW">30</span> min</b> and <b>low water <span id="nDtLW">45</span> min</b> after Roonagh. Spring high waters are 10 cm higher than Roonagh's and spring lows 10 cm lower, which follows the 1868 half-foot; neaps are the same as Roonagh's. That gives the Point a mean high water springs of <b>+<span id="nPMHWS">1.9</span> m</b> and a mean high water neaps of <b>+<span id="nPMHWN">0.9</span> m</b> OD Malin. These are close to the 2016 drawing, and they are why the foot of the steps sits right at neap high water.</p>
+<p>So the page puts <b>high water <span id="nDtHW">20</span> min</b> and <b>low water <span id="nDtLW">35</span> min</b> after Roonagh. Spring high waters are 10 cm higher than Roonagh's and spring lows 10 cm lower, which follows the 1868 half-foot; neaps are the same as Roonagh's. That gives the Point a mean high water springs of <b>+<span id="nPMHWS">1.9</span> m</b> and a mean high water neaps of <b>+<span id="nPMHWN">0.9</span> m</b> OD Malin. These are close to the 2016 drawing, and they are why the foot of the steps sits right at neap high water.</p>
 <p class="note">This is the biggest uncertainty on the page, along with the seabed. Twenty minutes either way would surprise nobody, nor would 20 cm. The check below is there to sort it out.</p>
 </div></details>
   <details id="dModel"><summary>The tide model in this page</summary><div id="dModelBody">
@@ -235,7 +235,7 @@
 </section>
 </main>
 <footer>
-  <p>The skyline behind the steps is the real one, Croagh Patrick from the Quay, borrowed from the Croagh Patrick page<a class="cite" href="#s-reek">reek</a> (heights stretched for legibility). Static page, no tracking, no accounts. Tide from Marine Institute predictions, fitted here and computed in your browser, so it works with no signal at the Quay; only the wind and water temperature need the internet. Try <a href="?at=2026-10-26T17:45">a spring high water at dusk</a>, <a href="?at=2026-10-27T12:30">a spring low at midday</a> or <a href="?at=2027-07-06T20:40">a July evening</a>; <a href="./">back to now</a>.</p>
+  <p>The skyline behind the steps is the real one, Croagh Patrick from the Quay, worked out from elevation data for the Croagh Patrick page<a class="cite" href="#s-reek">reek</a> (heights stretched for legibility). Static page, no tracking, no accounts. Tide from Marine Institute predictions, fitted here and computed in your browser, so it works with no signal at the Quay; only the wind and water temperature need the internet. Try <a href="?at=2026-10-26T17:45">a spring high water at dusk</a>, <a href="?at=2026-10-27T12:30">a spring low at midday</a> or <a href="?at=2027-07-06T20:40">a July evening</a>; <a href="./">back to now</a>.</p>
 </footer>
 <div class="sheet" id="cardSheet" hidden><div class="panel" role="dialog" aria-label="Share card">
   <button class="close" data-close aria-label="Close">×</button>
@@ -243,7 +243,7 @@
   <div class="seg" id="cardFormat"><button data-f="portrait" aria-pressed="true">4:5</button><button data-f="square" aria-pressed="false">square</button></div>
   <img class="cardPreview" id="cardImg" alt="The share card">
   <div class="row"><button id="cardShare">Share</button><button class="ghost" id="cardSave">Save image</button></div>
-  <p class="small">It's for the swim group's WhatsApp. It's an image: nothing about you is in it, and nothing is sent until you choose where it goes.</p>
+  <p class="small">Share this swim: send it to whoever you're going with. It's just an image, nothing about you is in it, and nothing is sent until you choose where it goes.</p>
 </div></div>
 <div class="sheet" id="inSheet" hidden><div class="panel" role="dialog" aria-label="Dip logged">
   <button class="close" data-close aria-label="Close">×</button>

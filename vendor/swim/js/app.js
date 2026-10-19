@@ -352,7 +352,7 @@ async function main() {
     openSheet('#inSheet');
     renderDips();
   });
-  $('#inDone').addEventListener('click', () => { closeSheet('#inSheet'); toast(current && current.where ? 'Dip and sighting saved on this phone.' : 'Dip saved on this phone.'); });
+  $('#inDone').addEventListener('click', () => { closeSheet('#inSheet'); toast(current && current.where ? 'Dip and sighting saved in this browser.' : 'Dip saved in this browser.'); });
   $('#inUndo').addEventListener('click', () => { if (current) LOG.remove(current.id); current = null; closeSheet('#inSheet'); renderDips(); toast('Removed.'); });
 
   function renderDips() {
@@ -378,7 +378,7 @@ async function main() {
     const applied = c && c.apply;
     $('#calib').innerHTML = cal.n
       ? `<b>Your sightings: ${cal.n}</b>${cal.below ? ` (and ${cal.below} "below the steps")` : ''}. On average the sea was <b>${sgn(cal.mean)} m</b> against the page's prediction${cal.sd != null ? `, give or take ${Math.max(1, Math.round(cal.sd * 100))} cm` : ''}. ${cal.n < 4 ? 'A few more at different states of the tide would say more.' : ''}
-        <label><input type="checkbox" id="applyCal" ${applied ? 'checked' : ''}> Correct my predictions by ${sgn(cal.mean)} m (your sightings, on this phone only)</label>`
+        <label><input type="checkbox" id="applyCal" ${applied ? 'checked' : ''}> Correct my predictions by ${sgn(cal.mean)} m (your sightings, in this browser only)</label>`
       : `<b>No sightings yet.</b> When you log a dip, say where the water was on the steps. Each one tells the page how far off its prediction was, and once you have a few you can let it correct itself. ${applied ? 'A correction from earlier is still applied.' : ''}`;
     const ap = $('#applyCal');
     if (ap) ap.addEventListener('change', () => { if (ap.checked) LOG.writeCal({ apply: true, dh: +cal.mean.toFixed(3), n: cal.n, at: Date.now() }); else LOG.writeCal(null); try { sessionStorage.setItem('swim:openDips', '1'); } catch { /* ignore */ } location.reload(); });

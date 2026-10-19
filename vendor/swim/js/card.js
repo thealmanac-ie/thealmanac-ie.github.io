@@ -1,5 +1,5 @@
 // The share card: the steps picture in miniature, the verdict, the next window, water temperature,
-// chop and the date, as a PNG for the swim group's WhatsApp. 4:5 (1080x1350) or square (1080x1080).
+// chop and the date, as a PNG to send to whoever you're going with. 4:5 (1080x1350) or square (1080x1080).
 // Shared with the Web Share API (files) where the phone supports it, otherwise downloaded.
 const SERIF = "Georgia, 'Iowan Old Style', 'Times New Roman', serif";
 const SANS = "-apple-system, system-ui, 'Segoe UI', Roboto, Arial, sans-serif";
