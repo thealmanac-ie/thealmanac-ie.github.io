@@ -1,0 +1,116 @@
+{
+  "about": "The national swims hub: every swim spot on the site on one map, with today's state of each (tide, the EPA's water quality and notices, and the live sea-state word), and the well-known spots we left out, with the reason. Template: swim-hub. Base map: tools/ireland-map.mjs. EPA snapshot (last-resort fallback): epa-snapshot.json, tools/epa-snapshot.mjs.",
+  "slug": "swims",
+  "template": "swim-hub",
+  "name": "Sea swims",
+  "area": "Ireland",
+  "listing": {
+    "group": "Ireland",
+    "order": 1,
+    "title": "Sea swims around Ireland",
+    "href": "swims/",
+    "linkText": "Sea swims around Ireland",
+    "blurb": "The Forty Foot, Vico, the Guillamene, Sandycove Island and the Point at Westport: how the sea is likely to be today, the tide, and whether the water is clean."
+  },
+  "seo": {
+    "title": "Sea swimming in Ireland today: sea state, tide, water quality",
+    "h1": "Sea swims around Ireland, today",
+    "description": "Well-known Irish sea swims on one map, with today's tide, the EPA's water quality and any Do Not Swim notice, and an estimate of how rough the sea is at each."
+  },
+  "intro": "Each spot gets the answer that matters for it. Where there is deep water at every tide, the sea decides: how much chop the wind can raise there and whether swell gets in. Where the swim depends on how much water is over the steps, the tide decides. Either way, the water quality and any Do Not Swim notice come first.",
+  "spots": [
+    "forty-foot",
+    "vico",
+    "guillamene",
+    "sandycove-island",
+    "westport"
+  ],
+  "labels": {
+    "forty-foot": {
+      "dx": -12,
+      "dy": -8,
+      "text": "Forty Foot"
+    },
+    "vico": {
+      "dx": -12,
+      "dy": 18,
+      "text": "Vico"
+    },
+    "guillamene": {
+      "dx": -12,
+      "dy": 22,
+      "text": "Guillamene"
+    },
+    "sandycove-island": {
+      "dx": 12,
+      "dy": 22,
+      "text": "Sandycove Island"
+    },
+    "westport": {
+      "dx": 12,
+      "dy": -6,
+      "text": "The Point, Westport"
+    }
+  },
+  "leftOut": [
+    {
+      "name": "Seapoint",
+      "lat": 53.29775,
+      "lon": -6.15961,
+      "kind": "depth",
+      "why": "A depth spot: the swim depends on how much water is at the foot of the slip by the Martello tower. The 2011 OPW LiDAR survey caught the sea itself there (at about 0.6 m below OD Malin), so the ground under the water where you'd swim was never measured, and a depth would be a guess. Dublin Port's tide predictions, 6.7 km away, would do for the tide."
+    },
+    {
+      "name": "The Half Moon, South Wall",
+      "lat": 53.3411,
+      "lon": -6.1641,
+      "kind": "depth",
+      "why": "A depth spot (steps off the Great South Wall), with Dublin Port's gauge 3.9 km away for the tide. But the LiDAR survey has no ground level at the steps, and OpenStreetMap doesn't place them, so we can't say how deep it is at any tide."
+    },
+    {
+      "name": "The Bull Wall shelters",
+      "lat": 53.3535,
+      "lon": -6.16762,
+      "kind": "depth",
+      "why": "A depth spot (steps down from the North Bull Wall), 3.7 km from Dublin Port's gauge. The LiDAR shows water, not ground, at the foot of the steps, so their depth at a given tide is unmeasured."
+    },
+    {
+      "name": "Blackrock diving tower, Salthill",
+      "lat": 53.25624,
+      "lon": -9.09225,
+      "kind": "depth",
+      "why": "The decision here is whether there is enough water under the tower, and the Galway tide gauge is only 3.3 km away. But the LiDAR survey was flown with the tide in at the tower (it shows a flat water surface at about 1.25 m OD Malin), so the bed below the boards was never measured. A diving depth is not something to guess."
+    },
+    {
+      "name": "The Pollock Holes, Kilkee",
+      "lat": 52.68406,
+      "lon": -9.66685,
+      "kind": "depth",
+      "why": "Rock pools on the Duggerna reef, usable when the tide is out and cut off when the sea washes over. The tide itself is fine: the Marine Institute's Carrigaholt and Lahinch predictions either side agree within 7 minutes. What we lack is the height of the reef: the 2011 LiDAR doesn't cover it, so we can't say at what tide or swell the sea gets in."
+    }
+  ],
+  "leftOutNote": "Left out for now, and why. Each would be built the moment its missing number is measured: one person with a tape and a known tide time at the steps, or a surveyed level, would do.",
+  "card": {
+    "title": "Sea swims around Ireland",
+    "subtitle": "Today's sea, tide and water",
+    "anchor": 0.5,
+    "ax": 0.5
+  },
+  "jsonld": {
+    "@type": "Place",
+    "name": "Ireland",
+    "address": {
+      "@type": "PostalAddress",
+      "addressCountry": "IE"
+    }
+  },
+  "attribution": [
+    "mi-tides-stations",
+    "epa-bw",
+    "open-meteo",
+    "om-marine",
+    "eudem",
+    "osm",
+    "opw-lidar"
+  ]
+}

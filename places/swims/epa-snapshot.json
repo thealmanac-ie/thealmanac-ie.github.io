@@ -1,0 +1,343 @@
+{
+ "about": "Snapshot of the EPA Bathing Water Open Data API (data.epa.ie/bw, CC BY 4.0) for the swim spots; refreshed by tools/epa-snapshot.mjs; used only if the live API and the build cache both fail.",
+ "fetchedAt": "2026-10-21T16:29:01.784Z",
+ "locations": {
+  "BPNBF310000160001": {
+   "beach_id": "BPNBF310000160001",
+   "beach_name": "Guillamene",
+   "local_authority_name": "Waterford City & County Council",
+   "beach_type": "Non-Identified Beach",
+   "current_annual_water_quality_classification": null,
+   "current_annual_classification_year": null,
+   "year1_annual_water_quality_classification": null,
+   "year1_annual_classification_year": null,
+   "year2_annual_water_quality_classification": null,
+   "year2_annual_classification_year": null,
+   "year3_annual_water_quality_classification": null,
+   "year3_annual_classification_year": null,
+   "annual_water_quality_assessment": null,
+   "has_all_season_bathing_restriction_in_place": null,
+   "reason_for_all_season_bathing_restriction": null,
+   "previous_year_stp_closure_days": null,
+   "short_term_pollution_risk": null,
+   "has_lifeguard": "No",
+   "lifeguard_availability": null,
+   "next_monitoring_date": null,
+   "last_updated": "2023-09-16T09:42:39"
+  },
+  "BPNBF310000180001": {
+   "beach_id": "BPNBF310000180001",
+   "beach_name": "Newtown Cove",
+   "local_authority_name": "Waterford City & County Council",
+   "beach_type": "Non-Identified Beach",
+   "current_annual_water_quality_classification": null,
+   "current_annual_classification_year": null,
+   "year1_annual_water_quality_classification": null,
+   "year1_annual_classification_year": null,
+   "year2_annual_water_quality_classification": null,
+   "year2_annual_classification_year": null,
+   "year3_annual_water_quality_classification": null,
+   "year3_annual_classification_year": null,
+   "annual_water_quality_assessment": null,
+   "has_all_season_bathing_restriction_in_place": null,
+   "reason_for_all_season_bathing_restriction": null,
+   "previous_year_stp_closure_days": null,
+   "short_term_pollution_risk": null,
+   "has_lifeguard": "No",
+   "lifeguard_availability": null,
+   "next_monitoring_date": null,
+   "last_updated": "2023-09-16T09:42:40"
+  },
+  "IEEABWC090_0000_0040": {
+   "beach_id": "IEEABWC090_0000_0040",
+   "beach_name": "Forty Foot Bathing Place",
+   "local_authority_name": "Dun Laoghaire Rathdown County Council",
+   "beach_type": "Identified Beach",
+   "current_annual_water_quality_classification": "Excellent Quality",
+   "current_annual_classification_year": 2025,
+   "year1_annual_water_quality_classification": "Excellent Quality",
+   "year1_annual_classification_year": 2024,
+   "year2_annual_water_quality_classification": "Excellent Quality",
+   "year2_annual_classification_year": 2023,
+   "year3_annual_water_quality_classification": "Excellent Quality",
+   "year3_annual_classification_year": 2022,
+   "annual_water_quality_assessment": "Forty Foot Bathing Place is classified as achieving Excellent Water Quality in 2025 based on the assessment of bacteriological results for the period 2022 to 2025. Forty Foot Bathing Place has achieved an Excellent Water Quality rating for the four consecutive years 2022 to 2025. Annual water quality ratings are generally calculated using monitoring results over a four-year period and are assessed against stringent bacterial limits to protect bather health.",
+   "has_all_season_bathing_restriction_in_place": "No",
+   "reason_for_all_season_bathing_restriction": null,
+   "previous_year_stp_closure_days": 4,
+   "short_term_pollution_risk": "Yes",
+   "has_lifeguard": "No",
+   "lifeguard_availability": null,
+   "next_monitoring_date": null,
+   "last_updated": "2026-03-31T11:15:40"
+  },
+  "IEEABWC100_0000_0450": {
+   "beach_id": "IEEABWC100_0000_0450",
+   "beach_name": "White Rock Beach",
+   "local_authority_name": "Dun Laoghaire Rathdown County Council",
+   "beach_type": "Identified Beach",
+   "current_annual_water_quality_classification": "Excellent Quality",
+   "current_annual_classification_year": 2025,
+   "year1_annual_water_quality_classification": "Excellent Quality",
+   "year1_annual_classification_year": 2024,
+   "year2_annual_water_quality_classification": "Excellent Quality",
+   "year2_annual_classification_year": 2023,
+   "year3_annual_water_quality_classification": "Excellent Quality",
+   "year3_annual_classification_year": 2022,
+   "annual_water_quality_assessment": "White Rock Beach is classified as achieving Excellent Water Quality in 2025 based on the assessment of bacteriological results for the period 2022 to 2025. White Rock Beach has achieved an Excellent Water Quality rating for the four consecutive years 2022 to 2025. Annual water quality ratings are generally calculated using monitoring results over a four-year period and are assessed against stringent bacterial limits to protect bather health.",
+   "has_all_season_bathing_restriction_in_place": "No",
+   "reason_for_all_season_bathing_restriction": null,
+   "previous_year_stp_closure_days": null,
+   "short_term_pollution_risk": "Yes",
+   "has_lifeguard": "No",
+   "lifeguard_availability": null,
+   "next_monitoring_date": null,
+   "last_updated": "2026-03-25T13:28:39"
+  },
+  "IESWBWC080_0000_0100": {
+   "beach_id": "IESWBWC080_0000_0100",
+   "beach_name": "Sandycove",
+   "local_authority_name": "Cork County Council",
+   "beach_type": "Non-Identified Beach",
+   "current_annual_water_quality_classification": null,
+   "current_annual_classification_year": null,
+   "year1_annual_water_quality_classification": null,
+   "year1_annual_classification_year": null,
+   "year2_annual_water_quality_classification": null,
+   "year2_annual_classification_year": null,
+   "year3_annual_water_quality_classification": null,
+   "year3_annual_classification_year": null,
+   "annual_water_quality_assessment": null,
+   "has_all_season_bathing_restriction_in_place": null,
+   "reason_for_all_season_bathing_restriction": null,
+   "previous_year_stp_closure_days": null,
+   "short_term_pollution_risk": null,
+   "has_lifeguard": "No",
+   "lifeguard_availability": null,
+   "next_monitoring_date": null,
+   "last_updated": "2026-03-13T10:39:58"
+  }
+ },
+ "alerts": [],
+ "alertsOk": true,
+ "measurements": {
+  "IEEABWC090_0000_0040": [
+   {
+    "date": "2026-10-12",
+    "status": "Excellent",
+    "ecoli": "41",
+    "enterococci": "5",
+    "inSeason": false
+   },
+   {
+    "date": "2026-09-28",
+    "status": "Excellent",
+    "ecoli": "<10",
+    "enterococci": "3",
+    "inSeason": false
+   },
+   {
+    "date": "2026-09-14",
+    "status": "Excellent",
+    "ecoli": "84",
+    "enterococci": "7",
+    "inSeason": true
+   },
+   {
+    "date": "2026-09-07",
+    "status": "Good",
+    "ecoli": "408",
+    "enterococci": "14",
+    "inSeason": true
+   },
+   {
+    "date": "2026-08-31",
+    "status": "Excellent",
+    "ecoli": "10",
+    "enterococci": "2",
+    "inSeason": true
+   },
+   {
+    "date": "2026-08-24",
+    "status": "Excellent",
+    "ecoli": "<10",
+    "enterococci": "3",
+    "inSeason": true
+   }
+  ],
+  "BPNBF310000160001": [
+   {
+    "date": "2026-09-14",
+    "status": "Excellent",
+    "ecoli": "20",
+    "enterococci": "29",
+    "inSeason": true
+   },
+   {
+    "date": "2026-08-17",
+    "status": "Excellent",
+    "ecoli": "<10",
+    "enterococci": "2",
+    "inSeason": true
+   },
+   {
+    "date": "2026-07-20",
+    "status": "Excellent",
+    "ecoli": "173",
+    "enterococci": "23",
+    "inSeason": true
+   },
+   {
+    "date": "2026-06-22",
+    "status": "Excellent",
+    "ecoli": "10",
+    "enterococci": "5",
+    "inSeason": true
+   },
+   {
+    "date": "2026-05-25",
+    "status": "Excellent",
+    "ecoli": "<20",
+    "enterococci": "3",
+    "inSeason": true
+   },
+   {
+    "date": "2025-09-03",
+    "status": "Excellent",
+    "ecoli": "<10",
+    "enterococci": "<1",
+    "inSeason": true
+   }
+  ],
+  "BPNBF310000180001": [
+   {
+    "date": "2026-09-14",
+    "status": "Excellent",
+    "ecoli": "10",
+    "enterococci": "3",
+    "inSeason": true
+   },
+   {
+    "date": "2026-08-17",
+    "status": "Excellent",
+    "ecoli": "10",
+    "enterococci": "<1",
+    "inSeason": true
+   },
+   {
+    "date": "2026-07-20",
+    "status": "Excellent",
+    "ecoli": "<10",
+    "enterococci": "4",
+    "inSeason": true
+   },
+   {
+    "date": "2026-06-22",
+    "status": "Excellent",
+    "ecoli": "135",
+    "enterococci": "18",
+    "inSeason": true
+   },
+   {
+    "date": "2026-05-25",
+    "status": "Excellent",
+    "ecoli": "145",
+    "enterococci": "23",
+    "inSeason": true
+   },
+   {
+    "date": "2025-09-05",
+    "status": "Excellent",
+    "ecoli": "31",
+    "enterococci": "4",
+    "inSeason": true
+   }
+  ],
+  "IESWBWC080_0000_0100": [
+   {
+    "date": "2026-09-01",
+    "status": "Excellent",
+    "ecoli": "10",
+    "enterococci": "8",
+    "inSeason": true
+   },
+   {
+    "date": "2026-08-17",
+    "status": "Excellent",
+    "ecoli": "110",
+    "enterococci": "12",
+    "inSeason": true
+   },
+   {
+    "date": "2026-07-20",
+    "status": "Excellent",
+    "ecoli": "31",
+    "enterococci": "17",
+    "inSeason": true
+   },
+   {
+    "date": "2026-06-22",
+    "status": "Excellent",
+    "ecoli": "10",
+    "enterococci": "6",
+    "inSeason": true
+   },
+   {
+    "date": "2026-05-25",
+    "status": "Excellent",
+    "ecoli": "<10",
+    "enterococci": "<1",
+    "inSeason": true
+   }
+  ],
+  "IEEABWC100_0000_0450": [
+   {
+    "date": "2026-10-12",
+    "status": "Excellent",
+    "ecoli": "10",
+    "enterococci": "21",
+    "inSeason": false
+   },
+   {
+    "date": "2026-09-28",
+    "status": "Excellent",
+    "ecoli": "30",
+    "enterococci": "28",
+    "inSeason": false
+   },
+   {
+    "date": "2026-09-14",
+    "status": "Excellent",
+    "ecoli": "10",
+    "enterococci": "18",
+    "inSeason": true
+   },
+   {
+    "date": "2026-09-07",
+    "status": "Excellent",
+    "ecoli": "<10",
+    "enterococci": "13",
+    "inSeason": true
+   },
+   {
+    "date": "2026-08-31",
+    "status": "Excellent",
+    "ecoli": "63",
+    "enterococci": "49",
+    "inSeason": true
+   },
+   {
+    "date": "2026-08-24",
+    "status": "Excellent",
+    "ecoli": "<10",
+    "enterococci": "<1",
+    "inSeason": true
+   }
+  ]
+ },
+ "measurementsOk": true,
+ "errors": [],
+ "ok": true,
+ "alertsFrom": "2026-10-21T16:29:01.784Z",
+ "measurementsFrom": "2026-10-21T16:29:01.784Z"
+}

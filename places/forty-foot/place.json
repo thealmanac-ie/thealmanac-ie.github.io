@@ -1,0 +1,110 @@
+{
+  "about": "The Forty Foot, Sandycove, Co. Dublin: a deep-water swim (conditions-governed). Template: swim, kind deep. Tide from the Marine Institute's Bray Harbour predictions (data/tide_model.json, tools/swim-tides.mjs); exposure from fetch.json (tools/swim-fetch.mjs); water quality from the EPA at build time.",
+  "slug": "forty-foot",
+  "template": "swim",
+  "app": "swim",
+  "name": "The Forty Foot",
+  "area": "County Dublin",
+  "listing": {
+    "group": "Swims",
+    "hidden": true,
+    "order": 1,
+    "title": "The Forty Foot",
+    "href": "swims/forty-foot/",
+    "linkText": "The Forty Foot today",
+    "blurb": "Deep water off Sandycove Point at any state of the tide: what the wind and swell are doing to it, the tide, and the EPA's latest on the water."
+  },
+  "seo": {
+    "title": "Forty Foot swim conditions today: tide, wind, swell, water quality",
+    "h1": "The Forty Foot today",
+    "kicker": "Sandycove Point, Co. Dublin",
+    "description": "Swimming at the Forty Foot today: estimated chop and swell, high and low tide, sea temperature, the EPA's water quality and any Do Not Swim notice."
+  },
+  "swim": {
+    "kind": "deep",
+    "short": "the Forty Foot",
+    "entry": {
+      "lat": 53.28949,
+      "lon": -6.1137,
+      "source": "OpenStreetMap node 332211029 (leisure=bathing_place, Forty Foot)"
+    },
+    "seaStart": {
+      "lat": 53.2897,
+      "lon": -6.1128
+    },
+    "marine": {
+      "lat": 53.2895,
+      "lon": -6.112
+    },
+    "governs": "Steps and rock ledges straight into deep water on the tip of Sandycove Point, swum at every state of the tide. What changes your swim is the sea: an east or north-east wind blows straight in.",
+    "deepBasis": "Swum at all stages of the tide, subject to the sea state, with submerged rocks a hazard especially at low water (travelextra.ie wild swimming guide). Wikipedia gives about 6 m of water at high tide; spring tides here fall about 3.3 m (Marine Institute), which still leaves a few metres at low water. Nobody publishes a measured depth.",
+    "tideNote": "The tide doesn't decide whether you can swim here, but at low water the rocks under the steps come closer to the surface: look before you jump.",
+    "lifeguard": "No lifeguard at the Forty Foot (Dún Laoghaire-Rathdown County Council); the beach next door at Sandycove has lifeguards in summer.",
+    "epa": [
+      {
+        "id": "IEEABWC090_0000_0040",
+        "name": "Forty Foot Bathing Place",
+        "relation": "this bathing water"
+      }
+    ],
+    "notices": []
+  },
+  "tide": {
+    "station": "Bray_Harbour_MODELLED",
+    "stationName": "Bray Harbour",
+    "kind": "modelled",
+    "km": 8.0,
+    "other": {
+      "station": "Dublin_Port",
+      "stationName": "Dublin Port",
+      "kind": "gauge",
+      "km": 9.5
+    },
+    "basis": "The Marine Institute's predictions for Bray Harbour, 8 km south (a model station), used as they are: no time or height shift. Its predictions for the Dublin Port gauge, 9.5 km the other side, agree on high water to within a minute on average and on low water to within 6 minutes (2026; single tides vary by up to about 10 minutes either way, because high water in Dublin Bay is long and flat)."
+  },
+  "card": {
+    "title": "The Forty Foot today",
+    "subtitle": "Wind, swell, tide and the water"
+  },
+  "jsonld": {
+    "@type": "Place",
+    "name": "The Forty Foot",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Sandycove",
+      "addressRegion": "County Dublin",
+      "addressCountry": "IE"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 53.28949,
+      "longitude": -6.1137
+    }
+  },
+  "attribution": [
+    "mi-tides-stations",
+    "epa-bw",
+    "open-meteo",
+    "om-marine",
+    "eudem",
+    "osm"
+  ],
+  "sources": [
+    {
+      "label": "EPA bathing water record, Forty Foot Bathing Place (IEEABWC090_0000_0040)",
+      "href": "https://www.beaches.ie/"
+    },
+    {
+      "label": "Dún Laoghaire-Rathdown County Council, The Forty Foot (not a lifeguarded location)",
+      "href": "https://www.dlrcoco.ie/beaches/forty-foot"
+    },
+    {
+      "label": "travelextra.ie, Wild swimming in county Dublin (all stages of the tide; submerged rocks at low water)",
+      "href": "https://www.travelextra.ie/wild-swimming-in-irelands-county-dublin/"
+    },
+    {
+      "label": "Wikipedia, Forty Foot (about 6 m deep at high tide)",
+      "href": "https://en.wikipedia.org/wiki/Forty_Foot"
+    }
+  ]
+}

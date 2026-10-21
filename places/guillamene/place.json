@@ -1,0 +1,107 @@
+{
+  "about": "The Guillamene and Newtown Cove, Tramore, Co. Waterford: deep-water swims (conditions-governed), 150 m apart. Template: swim, kind deep. Tide from Dunmore East.",
+  "slug": "guillamene",
+  "template": "swim",
+  "app": "swim",
+  "name": "The Guillamene and Newtown Cove",
+  "area": "County Waterford",
+  "listing": {
+    "group": "Swims",
+    "hidden": true,
+    "order": 3,
+    "title": "Guillamene and Newtown Cove",
+    "href": "swims/guillamene/",
+    "linkText": "The Guillamene today",
+    "blurb": "Two small coves at Tramore with ladders into deep water at any tide: how the sea is, the tide, and the water."
+  },
+  "seo": {
+    "title": "Guillamene and Newtown Cove today: tide, wind, swell, water",
+    "h1": "The Guillamene and Newtown Cove today",
+    "kicker": "Newtown, Tramore, Co. Waterford",
+    "description": "Swimming at the Guillamene and Newtown Cove, Tramore, today: estimated chop and swell, high and low tide, sea temperature, and what the EPA has on the water."
+  },
+  "swim": {
+    "kind": "deep",
+    "short": "the Guillamene",
+    "entry": {
+      "lat": 52.14404,
+      "lon": -7.16492,
+      "source": "OpenStreetMap node 257870856 (Guillamene Bathing Place); Newtown Cove beach, way 46672111, 150 m south-west"
+    },
+    "seaStart": {
+      "lat": 52.1432,
+      "lon": -7.164
+    },
+    "marine": {
+      "lat": 52.13,
+      "lon": -7.15
+    },
+    "governs": "Ladders and a slipway into deep water in two small coves on the west side of Tramore Bay. They face south-east, out across the bay: winds and swell from the south and south-east come straight in.",
+    "deepBasis": "The EPA's own description: the water at the Guillamene is \"deep at all stages of the tide and so is suitable for confident swimmers only\"; Newtown Cove has \"access to the deep water via ladders and a slipway and a stony beach\".",
+    "tideNote": "The tide doesn't decide whether you can swim here.",
+    "lifeguard": "The EPA lists no lifeguard at either cove.",
+    "epa": [
+      {
+        "id": "BPNBF310000160001",
+        "name": "Guillamene",
+        "relation": "this cove"
+      },
+      {
+        "id": "BPNBF310000180001",
+        "name": "Newtown Cove",
+        "relation": "the cove next door"
+      }
+    ],
+    "notices": []
+  },
+  "tide": {
+    "station": "Dunmore",
+    "stationName": "Dunmore East",
+    "kind": "gauge",
+    "km": 11.8,
+    "other": {
+      "station": "Dungarvan_MODELLED",
+      "stationName": "Dungarvan",
+      "kind": "modelled",
+      "km": 27.8
+    },
+    "basis": "The Marine Institute's predictions for its Dunmore East tide gauge, 12 km east, used as they are: no time or height shift. Its predictions for Dungarvan, 28 km west, put high and low water 10 to 12 minutes earlier, so at Tramore, in between and nearer Dunmore, expect the tide a few minutes earlier than shown."
+  },
+  "card": {
+    "title": "The Guillamene today",
+    "subtitle": "Wind, swell, tide and the water"
+  },
+  "jsonld": {
+    "@type": "Place",
+    "name": "The Guillamene",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Tramore",
+      "addressRegion": "County Waterford",
+      "addressCountry": "IE"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 52.14404,
+      "longitude": -7.16492
+    }
+  },
+  "attribution": [
+    "mi-tides-stations",
+    "epa-bw",
+    "open-meteo",
+    "om-marine",
+    "eudem",
+    "osm"
+  ],
+  "sources": [
+    {
+      "label": "EPA bathing water records, Guillamene (BPNBF310000160001) and Newtown Cove (BPNBF310000180001)",
+      "href": "https://www.beaches.ie/"
+    },
+    {
+      "label": "Donal Buckley, Lone Swimmer: Tramore, my main swimming location (2010)",
+      "href": "https://loneswimmer.com/2010/01/18/tramore-my-main-swimming-location/"
+    }
+  ]
+}

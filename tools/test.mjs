@@ -3,7 +3,7 @@
 // Live forecast calls are allowed (a handful of small requests). Exit code 1 on any failure.
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright-core';
 import { parseHTML } from 'linkedom';
@@ -21,6 +21,7 @@ const BASE = normBase(siteConfig.baseUrl);
 const fails = [], notes = [];
 const ok = (cond, msg) => { if (!cond) fails.push(msg); return cond; };
 const section = (t) => console.log(`\n== ${t}`);
+const places = () => fs.readdirSync(path.join(ROOT, 'places')).filter((d) => fs.existsSync(path.join(ROOT, 'places', d, 'place.json')));
 
 const browser = await chromium.launch();
 const server = await serve(DIST);
@@ -51,6 +52,7 @@ for (const loc of locs) {
   page.on('response', (r) => { if (r.status() >= 400) problems.push(`HTTP ${r.status()}: ${r.url()}`); });
   await page.goto(local(loc), { waitUntil: 'load' });
   const heavy = /\/(westport|croagh-patrick)\/$/.test(loc);
+  if (/\/swims\//.test(loc)) await page.waitForTimeout(2500); // the live sea-state estimate
   if (heavy) {
     await page.waitForTimeout(3500);
     if (loc.includes('croagh-patrick')) { await page.evaluate(() => document.querySelector('#where').scrollIntoView()); await page.waitForTimeout(4000); }
@@ -171,7 +173,47 @@ const noJs = async (p) => { const page = await ctxNo.newPage(); await page.goto(
   ok(dh.querySelectorAll('.hubmap svg a').length >= 6 && ['murrisk', 'newport', 'mulranny', 'achill-sound'].every((id) => dh.querySelector(`#${id} .kind-none`)) && dh.querySelectorAll('table.tt.hub tbody tr').length >= 4, 'clew-bay: map links, spot notes, today/tomorrow table');
   console.log(`  tomorrow page ok; ${days[1]} canonical -> tomorrow; louisburgh ${dl.querySelectorAll('table.tt.week')[1].querySelectorAll('tbody tr').length} days; hub ${dh.querySelectorAll('.hubmap svg a').length} map links`);
 }
+// the swim spots: notices first, the water quality with dates, the tide, sources; never "safe"
+{
+  const spots = locs.filter((l) => /\/swims\/[a-z-]+\/$/.test(l));
+  ok(spots.length >= 4, `swims: ${spots.length} spot pages in the sitemap`);
+  for (const l of spots) {
+    const { text, html } = await noJs(l.replace(BASE, ''));
+    const { document: d } = parseHTML(html);
+    const first = d.querySelector('main #notices');
+    ok(first && first.compareDocumentPosition(d.querySelector('#now')) & 4, `${l}: the notices come before the sea-state block`);
+    ok(/checked \w{3} \d+ \w{3} \d\d:\d\d/.test(first?.textContent || '') || d.querySelector('.notice-stop, .notice-warn'), `${l}: the notice line is timestamped`);
+    ok(d.querySelectorAll('#water .wq').length >= 1 && /\d{4}/.test(d.querySelector('#water').textContent), `${l}: water quality with dates`);
+    ok(d.querySelectorAll('#tide table.tt.week tbody tr').length === 3, `${l}: three days of tides in the HTML`);
+    ok(/Measured/.test(text) && /Predicted/.test(text) && /Estimated/.test(text), `${l}: says what is measured, predicted and estimated`);
+    ok(!/\bsafe\b/i.test(text.replace(/Nothing here says a swim is safe/g, '')), `${l}: never says "safe"`);
+  }
+  const { html: hh } = await noJs('swims/');
+  const dh = parseHTML(hh).document;
+  ok(dh.querySelectorAll('.hublist .hubrow').length >= 5 && dh.querySelectorAll('.hubmap svg a').length >= 10 && dh.querySelectorAll('#left-out ~ .spot').length >= 4, 'swims hub: rows for every spot, map pins, left-out spots with reasons');
+  console.log(`  swims: ${spots.length} spot pages and the hub (${dh.querySelectorAll('.hublist .hubrow').length} rows, ${dh.querySelectorAll('#left-out ~ .spot').length} left out)`);
+}
 await ctxNo.close();
+
+// the swim pages with JavaScript: the live estimate replaces the placeholder
+{
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, locale: 'en-IE', timezoneId: 'Europe/Dublin' });
+  const page = await ctx.newPage();
+  await page.goto(server.url + 'swims/forty-foot/', { waitUntil: 'load' });
+  await page.waitForFunction(() => document.querySelector('#svWord')?.textContent !== 'The sea, now', null, { timeout: 20000 }).catch(() => {});
+  const w = await page.evaluate(() => ({ word: document.querySelector('#svWord').textContent, best: document.querySelector('#svBest').textContent, tide: document.querySelector('#svTide')?.textContent }));
+  ok(w.word !== 'The sea, now' && /water at \d\d:\d\d/.test(w.tide || ''), `forty-foot live: verdict "${w.word}", tide "${w.tide}"`);
+  // and with the forecast blocked: the tide still renders, the page says why there is no estimate
+  const p2 = await ctx.newPage();
+  await p2.route(/open-meteo\.com/, (r) => r.abort());
+  await p2.addInitScript(() => localStorage.clear());
+  await p2.goto(server.url + 'swims/vico/', { waitUntil: 'load' });
+  await p2.waitForFunction(() => document.querySelector('#svWord')?.textContent === 'No forecast', null, { timeout: 20000 }).catch(() => {});
+  const w2 = await p2.evaluate(() => ({ word: document.querySelector('#svWord').textContent, tide: document.querySelector('#svTide')?.textContent }));
+  ok(w2.word === 'No forecast' && /water at \d\d:\d\d/.test(w2.tide || ''), `vico, forecast blocked: "${w2.word}", tide "${w2.tide}"`);
+  console.log(`  forty-foot live: ${w.word}; ${w.best.slice(0, 80)}`);
+  await ctx.close();
+}
 
 // ---------------------------------------------------------------- JSON-LD and share images
 section('JSON-LD and share images');
@@ -249,6 +291,33 @@ section('path prefix: build under /almanac/ and crawl');
   ok(fs.readFileSync(path.join(PDIR, 'robots.txt'), 'utf8').includes(`Sitemap: ${PBASE}sitemap.xml`), 'prefix: robots names the prefixed sitemap');
   await ctx.close(); await ps.close();
   fs.rmSync(PDIR, { recursive: true, force: true });
+}
+
+// ---------------------------------------------------------------- one slow API can't block a deploy
+section('degraded builds: a hung forecast, failed prerenders, the EPA down');
+{
+  const FDIR = path.join(ROOT, 'tmp', 'fault-dist'), CACHE = path.join(ROOT, 'tmp', 'fault-cache');
+  const run = (env) => { const r = spawnSync(process.execPath, [path.join(ROOT, 'lib/build.mjs')], { env: { ...process.env, DIST_DIR: FDIR, PRERENDER_CACHE: CACHE, ...env }, encoding: 'utf8' }); return { code: r.status, out: r.stdout + r.stderr }; };
+  const report = () => JSON.parse(fs.readFileSync(path.join(ROOT, 'tmp', 'build-report.json'), 'utf8')).degraded;
+  fs.rmSync(CACHE, { recursive: true, force: true });
+  // 1) the forecast API hangs: the Reek page is built without its verdict, with its own share card
+  let r = run({ PRERENDER_HANG_HOSTS: 'api.open-meteo.com', LIVE_BUDGET_MS: '4000' });
+  const cp = fs.readFileSync(path.join(FDIR, 'croagh-patrick/index.html'), 'utf8');
+  ok(r.code === 0 && /verdict comes live/.test(cp) && !/class="asof"/.test(cp) && report().some((e) => e.slug === 'croagh-patrick' && /forecast did not answer/.test(e.what)), `hung forecast: build ${r.code}, Reek page without a stale verdict, reported`);
+  ok(fs.statSync(path.join(FDIR, 'og/croagh-patrick.png')).size > 100000, 'hung forecast: the Reek share card is still its own');
+  // 2) prerenders fail outright, with a warm cache: the last good cards are reused
+  r = run({ PRERENDER_THROW: 'croagh-patrick,forty-foot', EPA_OFFLINE: '1' });
+  ok(r.code === 0 && report().filter((e) => /cached prerender/.test(e.what)).length === 2 && !report().some((e) => /fallback card/.test(e.what)), `failed prerenders, warm cache: build ${r.code}, cached cards reused`);
+  ok(/EPA bathing-water data: using the (cached|snapshot) copy/.test(r.out) && /from the last good check|from our stored copy/.test(fs.readFileSync(path.join(FDIR, 'swims/forty-foot/index.html'), 'utf8')), 'EPA down: the swim pages say which copy they show');
+  // 3) the same with a cold cache: the site's fallback card, honestly labelled
+  fs.rmSync(CACHE, { recursive: true, force: true });
+  r = run({ PRERENDER_THROW: 'croagh-patrick', EPA_OFFLINE: '1' });
+  ok(r.code === 0 && report().some((e) => e.slug === 'croagh-patrick' && /fallback card/.test(e.what)) && /the site's share card/.test(fs.readFileSync(path.join(FDIR, 'croagh-patrick/index.html'), 'utf8')), `failed prerender, cold cache: build ${r.code}, fallback card with matching alt text`);
+  // 4) everything failing is a broken build, not a slow API: it must stop
+  r = run({ PRERENDER_THROW: places().join(',') });
+  ok(r.code !== 0 && /every place failed/.test(r.out), `every prerender failing stops the build (exit ${r.code})`);
+  console.log('  hung forecast, failed prerenders (warm and cold cache), EPA down: deployable; total failure: stops');
+  fs.rmSync(FDIR, { recursive: true, force: true }); fs.rmSync(CACHE, { recursive: true, force: true });
 }
 
 // ---------------------------------------------------------------- privacy

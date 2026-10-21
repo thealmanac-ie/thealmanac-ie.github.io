@@ -5,13 +5,15 @@ The old almanac of tides, sun, moon and weather, made live and local, place by p
 | Path | What it answers | Template |
 |---|---|---|
 | `/` | The list of places (grows with the site) | site page |
-| `/westport/` | **Westport tide times**, and *Is there water at the Point?* (the depth at the swimming steps at Westport Quay) | `tide-swim` |
+| `/westport/` | **Westport tide times**, and *Is there water at the Point?* (the depth at the swimming steps at Westport Quay) | `swim`, kind `depth` (the swim lab app, `templates/tide-swim`) |
 | `/westport/tide-times/` | High and low tide for the next 30 days | `tide-swim` |
 | `/westport/tide-times/tomorrow/` | **High tide Westport tomorrow**: tomorrow's tides, rebuilt daily | `tide-swim` |
 | `/westport/tide-times/YYYY-MM-DD/` | One day (weekday in the title): tides, depth at the steps, a chart, light and moon | `tide-swim` |
 | `/louisburgh/tide-times/` | **Louisburgh tide times**: the Marine Institute's own predictions for Roonagh Pier, 30 days | `tide-times` |
 | `/clew-bay/tide-times/` | **Clew Bay tide times**: a map of the bay's tide spots, what backs each one's times, and honest notes for Murrisk, Newport, Mulranny and Achill Sound | `tide-hub` |
 | `/croagh-patrick/` | **Can I see the Reek today?** Summit cloud, the forecast for the top, the view from it | `mountain` |
+| `/swims/` | **Sea swims around Ireland**: every swim spot on a map with today's state of each (notices and water quality, tide, the sea-state word), and the well-known spots left out, with why | `swim-hub` |
+| `/swims/forty-foot/`, `/swims/vico/`, `/swims/guillamene/`, `/swims/sandycove-island/` | *How is the sea at the Forty Foot today?* Notices first, then the estimated chop and swell, the calmest daylight spell, the EPA's water quality with dates, the tide, and what is measured, predicted and estimated | `swim`, kind `deep` |
 | `/about/` | Sources, licences, privacy, safety | site page |
 
 The brand, the address (`https://thealmanac-ie.github.io/` first, then `https://thealmanac.ie/`) and the custom domain are settings in `site.config.mjs`.
@@ -29,6 +31,13 @@ templates/tide-swim/     index.mjs (page builder), adapter.mjs (values injected 
 templates/mountain/      index.mjs, adapter.mjs, mountain.css
 templates/tide-times/    a tide-times-only page (station mode: a Marine Institute station's own predictions)
 templates/tide-hub/      an area's tide spots on one page with a map (index.mjs, hub.css)
+templates/swim/          a swim spot, kind "depth" (delegates to tide-swim) or "deep" (deep.mjs: the sea decides);
+                         sea.mjs, the sea-state estimate (runs in Node and, as assets/swim-sea.js, in the browser)
+templates/swim-hub/      /swims/: every swim spot on a map of Ireland, today's state of each, the left-out spots
+places/<slug>/fetch.json a deep spot's fetch rose (tools/swim-fetch.mjs); places/swims/map.* the Ireland map
+                         (tools/ireland-map.mjs); places/swims/epa-snapshot.json (tools/epa-snapshot.mjs)
+lib/fallback.mjs         graceful degradation of the prerender (cache, fallback card, report)
+lib/epa.mjs              the EPA's bathing-water data at build time (live, else cached, else snapshot)
 lib/                     build.mjs (npm run build), prerender.mjs (headless Chromium), html.mjs (head,
                          JSON-LD), seo.mjs (sitemap, robots, the checks), chrome.mjs (footer, sources),
                          app.mjs (copy + minify an app), server.mjs, paths.mjs, scrub.mjs
@@ -68,6 +77,47 @@ The lab apps are developed in their own folders next to this repo (`../swim`, `.
 ### Privacy scrub
 
 Everything published (this repo and the built site) is checked for e-mail addresses, absolute local paths and private network addresses. A private list of further words (names, handles, host names, other projects) lives in `.scrub.local.json`, which is git-ignored and never published; `npm run sync` uses it to rewrite the lab apps' internal references and refuses to vendor anything that still matches.
+
+### When a live API is slow: the build degrades, it doesn't block
+
+On 21 Oct 2026 a build failed because the Croagh Patrick prerender waited 60 s for the live forecast; with no prerender there was no share card and no thumbnail, so the og:image checks failed. Now (`lib/fallback.mjs`):
+
+- **The live part has a budget.** The Reek page waits up to 40 s (`LIVE_BUDGET_MS`) for the forecast, then loads again offline and builds everything else (sources, the view from the top, the share card, which never needed the network). The page then says the verdict loads live. Each place's whole prerender has a budget too (`PRERENDER_BUDGET_S`, 150 s).
+- **A failed prerender falls back** to that place's last good one (`tmp/prerender-cache/<slug>.json`, kept between CI runs by `actions/cache`), minus anything time-sensitive (each template's `cacheable()` drops the weather verdict and the tide "as of" verdict), and failing that to the site's fallback card and thumbnail (`assets/og-fallback.png`, `assets/thumb-fallback.webp`, drawn by `tools/fallback-card.mjs`), with alt text that describes the fallback rather than the missing picture.
+- **The checks stay meaningful.** Every page still needs a 1200×630 PNG share image that exists. Every fallback is logged, written to `tmp/build-report.json` and raised as a GitHub Actions warning. The build still fails if Chromium can't start or if every place fails to prerender: that's a broken build, not a slow API. The EPA data falls back the same way (live, last good copy, committed snapshot), and the pages say which copy they show and when it was read.
+- **Tested by fault injection** in `npm test`: a hung forecast API (`PRERENDER_HANG_HOSTS=api.open-meteo.com`), prerenders that throw (`PRERENDER_THROW=slug,…`) with a warm and a cold cache, the EPA offline (`EPA_OFFLINE=1`), and everything failing (must stop).
+
+## Swim spots around Ireland
+
+The rule: more precise only where that changes someone's decision. A swimmer wants a clear verdict, the right time window and whether the water is clean. So there are two kinds of spot (`place.json` `"swim": { "kind": … }`, template `swim`):
+
+- **depth**: the swim depends on how much water is at a fixed point (steps, a slip, a pool), so the answer is the Point-style verdict: predicted tide level minus the *measured* level of that point, with its uncertainty (Westport's Point, the swim lab app).
+- **deep**: deep at every state of the tide, so the sea decides: tide state, wind chop and swell from the spot's own coastline (the fetch rose), sea temperature, the calmest daylight spell, and the EPA's water quality and any Do Not Swim notice, first on the page and timestamped. The pages never say "safe" (the tests check), and each says what is measured, predicted and estimated.
+
+A deep spot is `places/<slug>/place.json` (`swim`: entry, a point just offshore for the fetch, the marine-forecast point, EPA ids, notices; `tide`: the station and the evidence for it; `sources`), `app/data/tide_model.json` (`node tools/swim-tides.mjs <slug> <StationID>`) and `fetch.json` (`node tools/swim-fetch.mjs <slug>`). Add its slug to `places/swims/place.json`.
+
+### The shortlist (21 Oct 2026)
+
+| Spot | Kind | Nearest Marine Institute tide station (imiTidePrediction) | EPA bathing water | Built? |
+|---|---|---|---|---|
+| The Forty Foot, Sandycove | deep (all tides: travelextra.ie; about 6 m at high water) | Bray Harbour (model), 8.0 km; the Dublin Port gauge, 9.5 km, agrees within 1 min (HW) and 6 min (LW) on average | Forty Foot Bathing Place, identified: Excellent 2025; samples to 12 Oct 2026 | yes |
+| Vico Baths (Hawk Cliff), Dalkey | deep | Bray Harbour (model), 5.6 km | none of its own; White Rock Beach, 0.7 km: Excellent 2025 | yes, with the council's closure notice (works from March 2026, due end of June; no reopening notice found) |
+| The Guillamene and Newtown Cove, Tramore | deep ("deep at all stages of the tide": the EPA) | Dunmore East gauge, 11.8 km; Dungarvan (model), 27.8 km, is 10–12 min earlier | both non-identified (no classification); council samples to 14 Sep 2026 | yes |
+| Sandycove Island, Kinsale | deep (the 1.6 km loop; low-water walk-out) | Kinsale (model), 5.6 km; Crosshaven (model), 22.9 km, agrees within 3 min | Sandycove, non-identified; sampled to 1 Sep 2026 | yes |
+| Seapoint, Monkstown | depth (slip and steps by the Martello tower) | Dublin Port gauge, 6.7 km | Seapoint, identified: Excellent 2025 | **no**: the 2011 OPW LiDAR caught the sea at the foot of the slip (−0.6 m OD Malin), so the bed where you'd swim is unmeasured |
+| The Half Moon, South Wall | depth | Dublin Port gauge, 3.9 km | Half Moon, identified: Excellent 2025 | **no**: no LiDAR ground at the steps, and OpenStreetMap doesn't place them |
+| The Bull Wall shelters | depth | Dublin Port gauge, 3.7 km | North Bull Wall, non-identified | **no**: the LiDAR shows water, not ground, at the foot of the steps |
+| Blackrock diving tower, Salthill | depth (enough water under the boards?) | Galway gauge, 3.3 km | Salthill Beach, identified: Excellent 2025 | **no**: the LiDAR was flown with the tide in at the tower (flat water at about 1.25 m OD Malin), so there is no bed level, and a diving depth is not something to guess |
+| The Pollock Holes, Kilkee | depth (rock pools on a reef that dries) | Carrigaholt (model), 9.8 km; Lahinch (model), 31 km, agrees within 7 min, so the tide basis is fine | Kilkee, identified: Excellent 2025 | **no**: the 2011 LiDAR doesn't cover the reef, so the tide (or swell) at which the sea washes in is unknown |
+
+Every left-out spot is on the hub map, hollow, with its reason; one measured level (a surveyed height, or a tape and a known tide time at the steps) would put it in. The tide basis for every built spot is the station's own predictions, unshifted, with a neighbouring station as evidence that the difference is small (`node tools/swim-tides.mjs --compare A B`). A station with nothing to show it stands for the spot (a different coast, an estuary in between) would not do.
+
+### The data, and the terms
+
+- **Tide**: Marine Institute, ERDDAP `imiTidePrediction` (CC BY 4.0), 5-minute predictions for 2026, fitted with the swim app's constituents and checked on Jan–Feb 2027, which the fit never saw: about 2 min and 1–2 cm RMS at high and low water.
+- **Water quality and notices**: EPA Bathing Water Open Data API (`https://data.epa.ie/bw/api/v1/`: Locations, Measurements, Alerts; listed on data.gov.ie as CC BY 4.0; the data behind beaches.ie). It sends no CORS headers, so it is read at build time, every morning, and the pages show when. Locations give the annual classification (four seasons of samples), any all-season restriction, the short-term pollution risk flag and last season's closure days. Measurements give dated samples (about 26,000 records, oldest first, so the build reads the newest pages; out-of-season samples are included and labelled). Alerts carry the in-season incidents and restrictions and publish no schema, so `lib/epa.mjs` matches them by bathing-water id and shows whatever text and dates they carry. Measurements answered HTTP 500 for part of 21 Oct 2026: the pages fall back and say so. beaches.ie itself is not scraped.
+- **Sea state**: Open-Meteo forecast (wind, gusts, rain) and Open-Meteo Marine (swell height, direction and period; sea temperature), CC BY 4.0, fetched by the visitor's browser; the fetch rose from the OpenStreetMap coastline (ODbL); wave growth from the Shore Protection Manual (1984). The words (calm, a little lively, choppy, rough, big sea) are thresholds on the estimated wave height (0.15, 0.3, 0.6, 1.0 m): an ASSUMPTION, not yet checked against observations.
+- **Map**: AWS Terrain Tiles (EU-DEM), `tools/ireland-map.mjs`.
 
 ## Deploy
 

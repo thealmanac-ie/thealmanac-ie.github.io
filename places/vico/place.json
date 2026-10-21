@@ -1,0 +1,114 @@
+{
+  "about": "Vico Baths (Hawk Cliff), Dalkey, Co. Dublin: a deep-water swim (conditions-governed). Template: swim, kind deep. Tide from Bray Harbour; no EPA bathing water of its own, so White Rock's record is shown, labelled as a neighbour.",
+  "slug": "vico",
+  "template": "swim",
+  "app": "swim",
+  "name": "Vico Baths",
+  "area": "County Dublin",
+  "listing": {
+    "group": "Swims",
+    "hidden": true,
+    "order": 2,
+    "title": "Vico Baths",
+    "href": "swims/vico/",
+    "linkText": "Vico Baths today",
+    "blurb": "Steps and ladders off Hawk Cliff into Killiney Bay: the sea state, the tide, and the water quality next door."
+  },
+  "seo": {
+    "title": "Vico Baths swim conditions today: tide, wind, swell, water",
+    "h1": "Vico Baths today",
+    "kicker": "Hawk Cliff, Dalkey, Co. Dublin",
+    "description": "Swimming at Vico Baths (Hawk Cliff) today: estimated chop and swell, the tide, sea temperature, and the EPA's water quality for White Rock next door."
+  },
+  "swim": {
+    "kind": "deep",
+    "short": "Vico",
+    "entry": {
+      "lat": 53.26903,
+      "lon": -6.09782,
+      "source": "OpenStreetMap node 1751673303 (leisure=bathing_place, Vico Baths (Hawk Cliff))"
+    },
+    "seaStart": {
+      "lat": 53.269,
+      "lon": -6.0966
+    },
+    "marine": {
+      "lat": 53.2895,
+      "lon": -6.112
+    },
+    "governs": "Concrete steps and ladders down the rocks at Hawk Cliff into the open water of Killiney Bay. The bay faces east and south-east: those winds, and swell from that side, come straight in.",
+    "deepBasis": "Steps and ladders drop into deep water off the rocks (Wild Open Water listing). Nobody publishes a measured depth; we haven't found a source for the lowest tides here, so look before you jump.",
+    "tideNote": "Swum at most states of the tide; at low water the ladders end nearer the rocks.",
+    "lifeguard": "No lifeguard at Vico.",
+    "epa": [
+      {
+        "id": "IEEABWC100_0000_0450",
+        "name": "White Rock Beach",
+        "relation": "the nearest monitored bathing water, 0.7 km south; Vico itself is not one"
+      }
+    ],
+    "notices": [
+      {
+        "level": "closure",
+        "text": "Closed for repairs. Dún Laoghaire-Rathdown County Council closed Hawk's Cliff Swimming Place (Vico Baths) for repair works from the start of March 2026 (new steps, railings and swim ladders), with completion estimated for the end of June 2026, weather and tides allowing. We found no notice of its reopening: check before you go.",
+        "date": "2026-05-19",
+        "source": "Dún Laoghaire-Rathdown County Council notice",
+        "href": "https://www.dlrcoco.ie/news/general-news/essential-repair-works-hawks-cliff-swimming-place-vico-baths"
+      }
+    ]
+  },
+  "tide": {
+    "station": "Bray_Harbour_MODELLED",
+    "stationName": "Bray Harbour",
+    "kind": "modelled",
+    "km": 5.6,
+    "other": {
+      "station": "Dublin_Port",
+      "stationName": "Dublin Port",
+      "kind": "gauge",
+      "km": 11.9
+    },
+    "basis": "The Marine Institute's predictions for Bray Harbour, 5.6 km south across Killiney Bay (a model station), used as they are: no time or height shift. Its Dublin Port predictions, 12 km north, agree on high water to within a minute on average and on low water to within 6 minutes (2026)."
+  },
+  "card": {
+    "title": "Vico Baths today",
+    "subtitle": "Wind, swell, tide and the water"
+  },
+  "jsonld": {
+    "@type": "Place",
+    "name": "Vico Baths (Hawk Cliff)",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Dalkey",
+      "addressRegion": "County Dublin",
+      "addressCountry": "IE"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 53.26903,
+      "longitude": -6.09782
+    }
+  },
+  "attribution": [
+    "mi-tides-stations",
+    "epa-bw",
+    "open-meteo",
+    "om-marine",
+    "eudem",
+    "osm"
+  ],
+  "sources": [
+    {
+      "label": "Dún Laoghaire-Rathdown County Council, Essential repair works at Hawk's Cliff Swimming Place (Vico Baths), 19 May 2026",
+      "href": "https://www.dlrcoco.ie/news/general-news/essential-repair-works-hawks-cliff-swimming-place-vico-baths"
+    },
+    {
+      "label": "EPA bathing water record, White Rock Beach (IEEABWC100_0000_0450)",
+      "href": "https://www.beaches.ie/"
+    },
+    {
+      "label": "Wild Open Water, Vico Baths (steps and ladders into deep water)",
+      "href": "https://www.wildopenwater.com/swimspot/vico-baths-dun-laoghaire-rathdown-county-dublin-ireland"
+    }
+  ]
+}

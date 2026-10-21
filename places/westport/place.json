@@ -1,7 +1,8 @@
 {
-  "about": "Westport, Co. Mayo: tide times for Westport Quay, and the depth at the swimming steps at the Point. Template: tide-swim (the swim lab app). The per-spot model configuration (tide-station offsets, seabed at the steps, step geometry, datum) is the app's data/point.json, its station's constants are data/tide_model.json and its sources are js/sources.js. Westport is the app's own first instance, so it overlays nothing; a new spot puts its own copies of those files in places/<slug>/app/.",
+  "about": "Westport, Co. Mayo: tide times for Westport Quay, and the depth at the swimming steps at the Point. Template: swim, kind depth (the swim lab app, templates/tide-swim). The per-spot model configuration (tide-station offsets, seabed at the steps, step geometry, datum) is the app's data/point.json, its station's constants are data/tide_model.json and its sources are js/sources.js. Westport is the app's own first instance, so it overlays nothing; a new spot puts its own copies of those files in places/<slug>/app/.",
   "slug": "westport",
-  "template": "tide-swim",
+  "template": "swim",
+  "swim": { "kind": "depth" },
   "app": "swim",
   "name": "Westport",
   "area": "County Mayo",

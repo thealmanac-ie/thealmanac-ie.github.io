@@ -75,7 +75,7 @@ ${ctx.site.repoUrl ? `<p class="small">Source code: <a href="${esc(ctx.site.repo
 // 404.html is served for any missing path, at any depth, so its links are absolute (base path).
 export function notFound(ctx) {
   const b = basePath(ctx.site.baseUrl);
-  const links = ctx.places.map((pl) => `<li><a href="${b}${pl.listing.href}">${esc(pl.listing.linkText)}</a></li>`).join('');
+  const links = ctx.places.filter((pl) => !pl.listing.hidden).map((pl) => `<li><a href="${b}${pl.listing.href}">${esc(pl.listing.linkText)}</a></li>`).join('');
   const body = `<header class="top"><a class="brand" href="${b}">${esc(ctx.site.brand)}</a></header>
 <main><h1>Not here</h1>
 <p class="lede">That page doesn't exist, or no longer does. The day-by-day tide pages only run ${ctx.site.dayPages} days ahead, and each day's page is dropped once the day is over.</p>

@@ -1,0 +1,102 @@
+{
+  "about": "Sandycove Island, near Kinsale, Co. Cork: the island loop (about 1.6 km), conditions-governed with a low-water walk-out. Template: swim, kind deep. Tide from the Marine Institute's Kinsale model station. Exposure is for the outer side of the island.",
+  "slug": "sandycove-island",
+  "template": "swim",
+  "app": "swim",
+  "name": "Sandycove Island",
+  "area": "County Cork",
+  "listing": {
+    "group": "Swims",
+    "hidden": true,
+    "order": 4,
+    "title": "Sandycove Island",
+    "href": "swims/sandycove-island/",
+    "linkText": "Sandycove Island today",
+    "blurb": "The 1.6 km loop round the island near Kinsale: how rough the outer side is likely to be, the tide, and the water."
+  },
+  "seo": {
+    "title": "Sandycove Island swim today: tide, wind, swell and the loop",
+    "h1": "Sandycove Island today",
+    "kicker": "Sandycove, Kinsale, Co. Cork",
+    "description": "Swimming round Sandycove Island near Kinsale today: estimated chop and swell on the outer side, high and low tide for the walk-out, sea temperature and the water."
+  },
+  "swim": {
+    "kind": "deep",
+    "short": "Sandycove",
+    "entry": {
+      "lat": 51.67703,
+      "lon": -8.52387,
+      "source": "OpenStreetMap way 294687901 (the slipway at Sandycove); the island is way 4555830"
+    },
+    "seaStart": {
+      "lat": 51.675,
+      "lon": -8.516
+    },
+    "marine": {
+      "lat": 51.63,
+      "lon": -8.52
+    },
+    "governs": "The loop round the island is about 1.6 km. The slip side is sheltered by the island; the far side faces south and east, open to the sea. That far side is what the numbers here are for.",
+    "deepBasis": "A sea swim round an island rather than a depth at a step: \"the standard Sandycove Island circumnavigation swim is 1.6 km\". \"At low water, you need to walk out and back, but the swim is longer due to exposed reefs\", and there is an outer reef \"exposed or just under the water at low water\" (Ned Denison, in the Daily News of Open Water Swimming).",
+    "tideNote": "Near low water the reefs are uncovered: you walk out and back, the loop gets longer, and at spring low water the first 200 m are hard to swim without a scrape (Ned Denison).",
+    "lifeguard": "No lifeguard.",
+    "epa": [
+      {
+        "id": "IESWBWC080_0000_0100",
+        "name": "Sandycove",
+        "relation": "this bay"
+      }
+    ],
+    "notices": []
+  },
+  "tide": {
+    "station": "Kinsale_MODELLED",
+    "stationName": "Kinsale",
+    "kind": "modelled",
+    "km": 5.6,
+    "other": {
+      "station": "Crosshaven_MODELLED",
+      "stationName": "Crosshaven",
+      "kind": "modelled",
+      "km": 22.9
+    },
+    "basis": "The Marine Institute's predictions for its Kinsale model station, 5.6 km east, used as they are: no time or height shift. Its predictions for Crosshaven, 23 km further east, agree to within 3 minutes and 0.1 m, so the tide along this stretch of coast hardly varies."
+  },
+  "card": {
+    "title": "Sandycove Island today",
+    "subtitle": "Wind, swell, tide and the loop"
+  },
+  "jsonld": {
+    "@type": "Place",
+    "name": "Sandycove Island",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Kinsale",
+      "addressRegion": "County Cork",
+      "addressCountry": "IE"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 51.6762,
+      "longitude": -8.51769
+    }
+  },
+  "attribution": [
+    "mi-tides-stations",
+    "epa-bw",
+    "open-meteo",
+    "om-marine",
+    "eudem",
+    "osm"
+  ],
+  "sources": [
+    {
+      "label": "EPA bathing water record, Sandycove (IESWBWC080_0000_0100)",
+      "href": "https://www.beaches.ie/"
+    },
+    {
+      "label": "Daily News of Open Water Swimming, Centurions circumnavigating Sandycove Island (Ned Denison: the 1.6 km loop, the low-water walk-out and reefs)",
+      "href": "https://dailynewsofopenwaterswimming.com/?p=198615"
+    }
+  ]
+}

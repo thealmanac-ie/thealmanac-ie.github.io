@@ -93,7 +93,7 @@ export function html(ctx, place, info, pr) {
       doc.querySelector('#answerLine').textContent = 'The verdict comes live from the forecast, which your browser fetches when the page opens.';
     }
     const refs = [...doc.querySelectorAll('a.ref')];
-    if (snap.refs?.length === refs.length) refs.forEach((a, i) => { a.textContent = snap.refs[i]; }); else console.warn('  snapshot: footnote links changed shape, left as built');
+    if (snap.refs?.length === refs.length) refs.forEach((a, i) => { a.textContent = snap.refs[i]; }); else if (ok) console.warn('  snapshot: footnote links changed shape, left as built');
   }
   return { page, html: serialize(doc) };
 }
@@ -111,16 +111,26 @@ function viewList(horizon, cards, place) {
 
 export async function prerender(ctx, place, info, browser) {
   const url = ctx.serverUrl + place.slug + '/';
-  let s;
-  for (let attempt = 1; ; attempt++) { // the verdict needs the live forecast: one retry if it fails
+  const degraded = [];
+  // 1) the page with the live forecast. The static parts (sources, the view from the top) never need
+  //    the network; the verdict does, and it gets a fixed budget: if the forecast is slow or down, the
+  //    page is built without the verdict snapshot (it loads live in the visitor's browser), never blocked.
+  const budget = +(process.env.LIVE_BUDGET_MS || 40000);
+  const settle = (s, ms) => s.page.waitForFunction(() => { const v = document.querySelector('#hero')?.dataset.verdict; return v && v !== 'loading' && document.querySelectorAll('#sourceList li').length && document.querySelector('#panoSun')?.textContent && v; }, null, { timeout: ms }).then((h) => h.jsonValue(), () => 'timeout');
+  let s, v;
+  for (let attempt = 1; attempt <= 2; attempt++) {
     s = await open(browser, url, { allow: ['api.open-meteo.com'] });
-    await s.page.waitForFunction(() => {
-      const v = document.querySelector('#hero')?.dataset.verdict;
-      return v && v !== 'loading' && document.querySelectorAll('#sourceList li').length && document.querySelector('#panoSun')?.textContent;
-    }, null, { timeout: 60000 });
-    const v = await s.page.evaluate(() => document.querySelector('#hero').dataset.verdict);
-    if (v !== 'unknown' || attempt === 2) { if (v === 'unknown') console.warn(`  ${place.slug}: the forecast did not load; building without the verdict snapshot`); break; }
-    await s.close(); await new Promise((r) => setTimeout(r, 4000));
+    v = await settle(s, budget);
+    if (v !== 'unknown') break;
+    if (attempt === 1) { await s.close(); await new Promise((r) => setTimeout(r, 4000)); } // one retry for a failed (not slow) forecast
+  }
+  if (v === 'timeout' || v === 'unknown') {
+    degraded.push(v === 'timeout' ? `the forecast did not answer within ${budget / 1000} s: no verdict snapshot` : 'the forecast did not load: no verdict snapshot');
+    // the rest of the page doesn't need the forecast: load it again offline, where it settles at once
+    await s.close();
+    s = await open(browser, url);
+    v = await settle(s, 30000);
+    if (v === 'timeout') throw new Error('the page did not render even offline');
   }
   await s.page.waitForTimeout(300);
   const snap = await extract(s.page, SPEC);
@@ -145,10 +155,17 @@ export async function prerender(ctx, place, info, browser) {
   const og = await composeCard(c.page, { scene: '#heroCanvas', anchor: 1, brand: `${ctx.site.brand} · ${place.name}`, title: place.card.title, subtitle: place.card.subtitle, fontBase: ctx.serverUrl + 'assets/fonts/' });
   const ogHome = await composeCard(c.page, { scene: '#heroCanvas', anchor: 1, brand: 'Tides, sun, moon and weather', title: ctx.site.brand, subtitle: 'Live and local, place by place', fontBase: ctx.serverUrl + 'assets/fonts/' });
   await c.close();
-  return { snap, asOf, cards, poster, og, ogHome, thumb, problems };
+  return { snap, asOf, cards, poster, og, ogHome, thumb, problems, degraded };
 }
 
 export const provisional = (ctx, place, info) => html(ctx, place, info, null).html;
+
+// What may be reused from an earlier build if a later prerender fails: everything except the
+// weather (a day-old verdict would be wrong, so the page says the verdict loads live instead).
+export function cacheable(pr) {
+  const snap = Object.fromEntries(Object.entries(pr.snap || {}).filter(([k]) => !WEATHER.includes(k) && k !== 'hero'));
+  return { snap, cards: pr.cards, poster: pr.poster, og: pr.og, ogHome: pr.ogHome, thumb: pr.thumb };
+}
 
 export function write(ctx, place, info, pr) {
   const { page, html: out } = html(ctx, place, info, pr);

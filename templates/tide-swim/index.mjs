@@ -91,7 +91,7 @@ export function html(ctx, place, info, pr) {
   for (const j of doc.head.querySelectorAll('link[rel="modulepreload"]')) if (j.getAttribute('href') === 'js/app.js') j.remove(); // app.js is the entry script itself
 
   // ---- hero: time label, the estimate's honesty, then the snapshot (if any)
-  one(doc, '#when').textContent = snap ? `As of ${F.day(snap.when)}, ${F.hm(snap.when)}` : '\u00a0';
+  one(doc, '#when').textContent = snap?.verdict ? `As of ${F.day(snap.when)}, ${F.hm(snap.when)}` : '\u00a0';
   insertAfter(doc, one(doc, '#correctedNote'), `<div class="est">Depth ±${S.uncertaintyM} m: an estimate, not a measurement. <a href="#tell">Tell us where the water was</a></div>`);
   insertAfter(doc, one(doc, 'header#hero'), `<aside class="tellBand" aria-label="Help calibrate this page"><p><b>Every depth here is worked out, not measured (±${S.uncertaintyM} m).</b> At the steps? Say where the water was and this page gets better.</p><a class="btn" href="#tell">Tell us where the water was</a></aside>`);
 
@@ -155,8 +155,8 @@ function inject(doc, snap) {
   for (const s of SPEC) if (!s.all && s.key !== 'hero') set(s.sel, snap[s.key]);
   if (snap.hero?.attrs?.['data-tone']) doc.querySelector('#hero').setAttribute('data-tone', snap.hero.attrs['data-tone']);
   const fill = (sel, list) => { const els = [...doc.querySelectorAll(sel)]; if (!list || list.length !== els.length) return false; els.forEach((e, i) => { e.textContent = list[i]; }); return true; };
-  if (!fill('span[id^="n"]', snap.nums)) console.warn('  snapshot: number spans changed shape, left as built');
-  if (!fill('a.cite', snap.cites)) console.warn('  snapshot: citation links changed shape, left as built');
+  if (snap.nums && !fill('span[id^="n"]', snap.nums)) console.warn('  snapshot: number spans changed shape, left as built');
+  if (snap.cites && !fill('a.cite', snap.cites)) console.warn('  snapshot: citation links changed shape, left as built');
 }
 
 export async function prerender(ctx, place, info, browser) {
@@ -218,6 +218,14 @@ function cardMoment(info) {
 function local(util, t) { const p = util.localParts(t), z = (n) => String(n).padStart(2, '0'); return `${p.y}-${z(p.mo)}-${z(p.d)}T${z(p.h)}:${z(p.mi)}`; }
 
 export const provisional = (ctx, place, info) => html(ctx, place, info, null).html;
+
+// What may be reused from an earlier build if a later prerender fails: the share card, thumbnail,
+// day charts (keyed by date) and the parts of the snapshot that don't move with the tide. The hero
+// verdict, windows and tables are left to the live app (and the server-rendered tide tables).
+const STATIC_SNAP = ['sourceList', 'datumFig', 'roseFig', 'climFig', 'futureChart', 'slrTable', 'futureText', 'yearText', 'cites'];
+export function cacheable(pr) {
+  return { snap: Object.fromEntries(STATIC_SNAP.filter((k) => pr.snap?.[k]).map((k) => [k, pr.snap[k]])), charts: pr.charts, og: pr.og, thumb: pr.thumb, poster: pr.poster };
+}
 
 export function write(ctx, place, info, pr) {
   const { page, html: out } = html(ctx, place, info, pr);

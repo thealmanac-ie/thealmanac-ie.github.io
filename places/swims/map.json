@@ -1,0 +1,11 @@
+{
+ "about": "Ireland base map for /swims/: relief and coastline from AWS Terrain Tiles (EU-DEM; GEBCO/ETOPO at sea), zoom 8, with our hillshade. Web Mercator; bounds are [west, south, east, north].",
+ "bounds": [
+  -10.75,
+  51.35,
+  -5.3,
+  55.45
+ ],
+ "width": 760,
+ "height": 960
+}

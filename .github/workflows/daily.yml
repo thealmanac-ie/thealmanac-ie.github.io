@@ -36,6 +36,12 @@ jobs:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
       - run: npx playwright-core install --with-deps --only-shell chromium
+      - name: Last good prerender (fallback if a live API is slow; see lib/fallback.mjs)
+        uses: actions/cache@v4
+        with:
+          path: tmp/prerender-cache
+          key: prerender-${{ github.run_id }}
+          restore-keys: prerender-
       - id: pages
         uses: actions/configure-pages@v5
       - name: Build
@@ -43,6 +49,9 @@ jobs:
         env:
           BASE_URL: ${{ steps.pages.outputs.base_url }}/
         run: npm run build
+      - name: Build report (fallbacks used, if any)
+        if: always()
+        run: cat tmp/build-report.json || true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
