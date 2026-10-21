@@ -35,7 +35,8 @@ export function renderCard(hero, heroState, info, format = 'portrait') {
   const textH = wordSize * 0.95 + lines.length * 50 + 30 + pillH + (chips.length ? 26 + 62 : 0) + 74;
   const sceneH = Math.round(H - textH);
   // the picture: same drawing as the page, framed so the steps, the person and the Reek all fit
-  hero.renderTo(g, W, sceneH + 60, heroState, { horizon: 0.5, metres: 7.0, bottom: 70 });
+  // the window reaches just below this moment's level (a still picture need not hold the whole range)
+  hero.renderTo(g, W, sceneH + 60, heroState, { horizon: 0.5, metres: 7.0, bottom: 70, zLow: Math.min(hero.geom.bedBest - 0.6, heroState.level - 0.45, heroState.ghost ?? Infinity) });
   const fade = g.createLinearGradient(0, sceneH - 110, 0, sceneH + 10);
   fade.addColorStop(0, 'rgba(244,239,230,0)'); fade.addColorStop(1, 'rgba(244,239,230,1)');
   g.fillStyle = fade; g.fillRect(0, sceneH - 110, W, 120);

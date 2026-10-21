@@ -41,26 +41,52 @@ export class Hero {
     if (this.state) this.draw();
   }
   // layout: sky and the Reek on top (the verdict text sits there), the cut below the horizon.
-  // The cut is drawn at one scale both ways (S px per metre) so the person and the steps
-  // are true to size; ~7 m of section fits across.
+  // The cut is drawn at one scale both ways (S px per metre) so the person and the steps are true
+  // to size. The scale is the largest that fits the whole tidal range between the top of the steps
+  // and the window's low level (zLow, below the lowest astronomical tide), so every water level
+  // the tide can reach is drawn at its true height, in the frame, against the steps and the person.
   layout(W, H, o = {}) {
     this.W = W; this.H = H;
-    this.yH = Math.round(H * (o.horizon ?? 0.58));
+    this.yH = Math.round(H * (o.horizon ?? 0.47));
     const g = this.geom;
-    this.S = W / (o.metres ?? 7.2);
-    const yBot = H - (o.bottom ?? 112);
-    this.zTop = g.top + 0.5;
-    this.zBot = this.zTop - (yBot - (this.yH + 16)) / this.S;
-    this.yZ = (z) => yBot - (z - this.zBot) * this.S;
+    const yBot = H - (o.bottom ?? 128);
+    this.yBot = yBot;
+    this.yCut = this.yH + 18; // top of the section window, kept clear of the far-bay strip at the horizon
+    this.zTop = g.top + 0.25;
+    this.zLow = o.zLow ?? g.zLow;
+    this.S = Math.min(W / (o.metres ?? 7.2), (yBot - this.yCut) / (this.zTop - this.zLow));
+    this.yZ = (z) => yBot - (z - this.zLow) * this.S;
+    this.zY = (y) => this.zLow + (yBot - y) / this.S;
     this.x0 = 0;
     this.xM = (m) => this.x0 + m * this.S;
+    // the foreshore: the shelf runs out from the foot of the steps; a break line stands for the
+    // ~30 m of shelf the screen can't hold; then the bed drops into the channel, below any tide
+    const Wm = W / this.S;
+    this.xBreak = g.footX + Math.max(1.6, (Wm - g.footX) * 0.55);
+    this.xChan = this.xBreak + 0.35;
+  }
+  bedZ(xm) { // bed level (m OD Malin) at xm metres along the section
+    const g = this.geom;
+    if (xm <= g.footX) return g.bedBest;
+    if (xm < this.xBreak) return g.bedBest - g.bedSlope * (xm - g.footX);
+    const zShelf = g.bedBest - g.bedSlope * g.shelfLen;
+    if (xm < this.xChan) return zShelf;
+    const f = clamp((xm - this.xChan) / Math.max(0.5, this.W / this.S - this.xChan), 0, 1), e = f * f * (3 - 2 * f);
+    return zShelf + (this.zLow - 0.35 - zShelf) * Math.sqrt(e);
+  }
+  waterLeftX(z) { // px where the water's surface meets the steps or the foreshore at level z
+    const g = this.geom;
+    if (z >= g.bedBest) return this.wallX(z);
+    const Wm = (this.W - this.x0) / this.S;
+    for (let xm = g.footX; xm <= Wm + 0.02; xm += 0.01) if (this.bedZ(xm) <= z) return this.xM(xm);
+    return this.W + 1;
   }
   // Draw a state into another 2D context (the share card), leaving the live hero untouched.
   renderTo(ctx, W, H, state, o = {}) {
-    const keep = ['g', 'W', 'H', 'yH', 'S', 'zTop', 'zBot', 'yZ', 'x0', 'xM', 'state', 'labelAt', 'tone', 'depthWord'].map((k) => [k, this[k]]);
+    const keep = ['g', 'W', 'H', 'yH', 'yBot', 'yCut', 'S', 'zTop', 'zLow', 'yZ', 'zY', 'x0', 'xM', 'xBreak', 'xChan', 'state', 'labelAt', 'tone', 'depthWord', 'lastDraw'].map((k) => [k, this[k]]);
     this.g = ctx; this.layout(W, H, o); this.state = state;
     this.draw();
-    const out = { labelAt: this.labelAt, tone: this.tone, yH: this.yH };
+    const out = { labelAt: this.labelAt, tone: this.tone, yH: this.yH, draw: this.lastDraw };
     for (const [k, v] of keep) this[k] = v;
     return out;
   }
@@ -126,76 +152,96 @@ export class Hero {
       const lc = s.sun.alt < -6 ? mixC(layerCol[k], [8, 12, 20], 0.65) : layerCol[k];
       g.fillStyle = css(lc); g.fill();
     }
-    // the bay between the cut and the horizon: water out to the horizon at high tide; as the tide
-    // drops below the shelf in front of the Point, bare flats spread out from the near side until,
-    // around the level of the banks further out (~-1.1 m OD, the charted drying height), the bay is drained
+    // Below the horizon. Only the section (the cut) shows the water level. The far bay is a thin,
+    // faded strip at the horizon itself, well clear of the top of the section, and behind the section
+    // is haze (distant shore and air), never water, so nothing behind the steps reads as a level.
     const zw = s.level, yS = this.yZ(zw);
     const dark = s.sun.alt < -4;
-    const g0 = this.geom;
-    const dryFrac = clamp((g0.flats - zw) / (g0.flats - g0.bayBed), 0, 1);
-    const yDry = yS - dryFrac * (yS - yH) * 0.97; // water above this line, bare flats below it
-    const wgr = g.createLinearGradient(0, yH, 0, Math.max(yH + 1, yDry));
-    wgr.addColorStop(0, css(mixC(hor, [60, 90, 110], 0.35))); wgr.addColorStop(1, css(mixC(zen, [14, 54, 70], dark ? 0.7 : 0.45)));
-    g.fillStyle = wgr; g.fillRect(0, yH, W, Math.max(0, yDry - yH) + 1);
-    // in calm water the hills show upside down in the bay
+    const yBand = yH + Math.max(5, Math.round((this.yCut - yH) * 0.45));
+    const hz = g.createLinearGradient(0, yBand, 0, H);
+    hz.addColorStop(0, css(mixC(hor, dark ? [26, 24, 22] : [150, 138, 106], dark ? 0.6 : 0.5)));
+    hz.addColorStop(1, css(mixC(hor, dark ? [12, 12, 12] : [112, 100, 76], dark ? 0.85 : 0.72)));
+    g.fillStyle = hz; g.fillRect(0, yBand, W, H - yBand);
+    { // faint far-shore streaks in the haze
+      const r = rng(13); g.fillStyle = dark ? 'rgba(255,255,255,.025)' : 'rgba(80,70,50,.07)';
+      for (let k = 0; k < 26; k++) { const y = yBand + 3 + r() * (H - yBand) * 0.6; g.fillRect(r() * W, y, 20 + r() * 70, 1); }
+    }
+    const fb = g.createLinearGradient(0, yH, 0, yBand);
+    fb.addColorStop(0, css(mixC(hor, [60, 90, 110], 0.25), 0.9)); fb.addColorStop(1, css(mixC(hor, [60, 90, 110], 0.25), 0.25));
+    g.fillStyle = fb; g.fillRect(0, yH, W, yBand - yH);
+    // in calm water the hills show upside down in the far bay
     const calm = !s.chop || s.chop.Hs < 0.06;
-    if (calm && yDry - yH > 8) {
-      g.save(); g.beginPath(); g.rect(0, yH, W, yDry - yH); g.clip();
-      g.globalAlpha = s.sun.alt < -6 ? 0.1 : 0.22;
+    if (calm) {
+      g.save(); g.beginPath(); g.rect(0, yH, W, yBand - yH); g.clip();
+      g.globalAlpha = s.sun.alt < -6 ? 0.08 : 0.18;
       for (const k of [1, 0]) {
         g.beginPath(); g.moveTo(0, yH);
         for (let x = 0; x <= W; x += 3) {
           const az = VIEW_AZ + (x - W / 2) / ppd;
           const f = clamp((az - sk.az0) / sk.step, 0, sk.n - 1), i = Math.floor(f), t = f - i;
           const L = sk.layers[k]; const a = (L[i] + (L[Math.min(i + 1, sk.n - 1)] - L[i]) * t) / 100;
-          g.lineTo(x, yH + Math.max(0, a) * ppd * VEX * 0.7 + Math.sin(x * 0.9 + this.phase * 4) * 0.6);
+          g.lineTo(x, yH + Math.max(0, a) * ppd * VEX * 0.25);
         }
         g.lineTo(W, yH); g.closePath(); g.fillStyle = css(layerCol[k]); g.fill();
       }
       g.restore();
     }
-    // sun path on whatever water there is
+    // sun path on the far bay
     if (s.sun.alt > -2 && sx > -40 && sx < W + 40) {
       const a = clamp(0.4 - s.sun.alt / 60, 0.08, 0.4);
       g.fillStyle = `rgba(255,220,160,${a})`;
-      for (let y = yH + 2; y < yDry; y += 3) { const w = 4 + (y - yH) * 0.25; g.fillRect(sx - w / 2 + Math.sin(y * 0.7 + this.phase * 3) * 2, y, w, 1.2); }
+      for (let y = yH + 1; y < yBand; y += 2) { const w = 6 + (y - yH) * 1.2; g.fillRect(sx - w / 2 + Math.sin(y * 0.7 + this.phase * 3) * 2, y, w, 1); }
     }
-    // the bare flats, with a creek winding out to the water, weed and wet sheen
-    if (dryFrac > 0) {
-      const top = yDry, bandH = Math.max(1, yS - top);
-      const fg = g.createLinearGradient(0, top, 0, yS);
-      fg.addColorStop(0, css(mixC(hor, [70, 80, 70], 0.5))); fg.addColorStop(1, css(dark ? [30, 32, 28] : [104, 92, 70]));
-      g.fillStyle = fg; g.fillRect(0, top, W, bandH + 1);
-      const waterC = css(mixC(hor, [40, 70, 90], dark ? 0.7 : 0.35));
-      g.fillStyle = waterC; g.beginPath();
-      const cx = (f) => W * (0.62 + 0.18 * Math.sin(f * 5.2 + 0.6) * (1 - f * 0.4));
-      for (let k = 0; k <= 30; k++) { const f = k / 30; g.lineTo(cx(f) - (1.5 + f * f * 22), top + bandH * f); }
-      for (let k = 30; k >= 0; k--) { const f = k / 30; g.lineTo(cx(f) + (1.5 + f * f * 22), top + bandH * f); }
-      g.closePath(); g.fill();
-      const r = rng(11); g.fillStyle = dark ? 'rgba(20,24,18,.6)' : 'rgba(84,72,38,.55)';
-      const nWeed = Math.round(46 * dryFrac) + 6;
-      for (let k = 0; k < nWeed; k++) { const y = top + 3 + r() * Math.max(1, bandH - 5); const w = 6 + r() * 30 * (y - yH) / Math.max(1, yS - yH); g.fillRect(r() * W, y, w, 1.5); }
-      if (!dark) { g.fillStyle = 'rgba(255,255,255,.18)'; for (let k = 0; k < 18; k++) { const y = top + 2 + r() * Math.max(1, bandH - 4); g.fillRect(r() * W, y, 10 + r() * 40 * (y - yH) / Math.max(1, yS - yH), 1); } }
-    }
-    // low sun: a warm wash from the sun's side over sky, water and flats
+    // low sun: a warm wash from the sun's side over the sky and the far bay
     if (s.sun.alt > -3 && s.sun.alt < 14) {
       const w = clamp(1 - Math.abs(s.sun.alt - 3) / 11, 0, 1) * 0.28;
       const gx = clamp(sx, -W * 0.3, W * 1.3);
       const wg2 = g.createRadialGradient(gx, yH, 0, gx, yH, W * 1.1);
       wg2.addColorStop(0, `rgba(255,170,90,${w})`); wg2.addColorStop(1, 'rgba(255,170,90,0)');
-      g.fillStyle = wg2; g.fillRect(0, 0, W, Math.max(yS, yH));
+      g.fillStyle = wg2; g.fillRect(0, 0, W, yBand);
     }
-    // ground under the cut (mud and stones)
+    // ground under the cut (mud and stones): the shelf, the break, the drop into the channel
     const gb = this.geom;
-    const xFoot = this.xM(gb.footX), xR = W + 10;
-    const bedY = (xm) => this.yZ(gb.bedBest - gb.bedSlope * Math.max(0, xm - gb.footX));
+    const xFoot = this.xM(gb.footX), xB = this.xM(this.xBreak), xR = W + 3;
+    const bedY = (xm) => this.yZ(this.bedZ(xm));
+    const bedPts = [];
+    for (let x = xFoot; x < xR; x += 3) {
+      if (bedPts.length && bedPts[bedPts.length - 1][0] < xB && x >= xB) bedPts.push([xB, bedY(this.xBreak - 1e-6)], [xB, bedY(this.xBreak)]);
+      bedPts.push([x, bedY((x - this.x0) / this.S)]);
+    }
+    bedPts.push([xR, bedY((xR - this.x0) / this.S)]);
     g.fillStyle = dark ? '#1f1a15' : '#5c4a37';
     g.beginPath(); g.moveTo(0, H); g.lineTo(0, this.yZ(gb.bedBest));
-    for (let x = xFoot; x <= xR; x += 6) g.lineTo(x, bedY((x - this.x0) / this.S));
+    for (const [x, y] of bedPts) g.lineTo(x, y);
     g.lineTo(xR, H); g.closePath(); g.fill();
     // stony crust on the bed
     const r2 = rng(5); g.fillStyle = dark ? 'rgba(80,70,60,.5)' : 'rgba(150,130,104,.6)';
     for (let k = 0; k < 70; k++) { const x = xFoot + r2() * (W - xFoot); const y = bedY((x - this.x0) / this.S) + r2() * 6; g.beginPath(); g.ellipse(x, y, 1.5 + r2() * 3, 1 + r2() * 1.6, 0, 0, Math.PI * 2); g.fill(); }
+    // bare foreshore: weed and a wet sheen wherever the bed is out of the water
+    {
+      const r = rng(17);
+      for (let k = 0; k < 60; k++) {
+        const x = xFoot + 4 + r() * (W - xFoot - 4), xm = (x - this.x0) / this.S, zb = this.bedZ(xm);
+        if (zb <= zw + 0.01 || Math.abs(x - xB) < 5) continue;
+        const y = this.yZ(zb);
+        g.fillStyle = dark ? 'rgba(40,46,30,.85)' : 'rgba(70,74,34,.85)';
+        g.beginPath(); g.ellipse(x, y - 1, 3 + r() * 5, 1.4 + r() * 1.2, 0, 0, Math.PI * 2); g.fill();
+      }
+      g.strokeStyle = dark ? 'rgba(170,190,200,.18)' : 'rgba(255,255,255,.35)'; g.lineWidth = 1;
+      g.beginPath(); let on = false;
+      for (const [x, y] of bedPts) { const dry = this.zY(y) > zw + 0.01; if (dry && !on) { g.moveTo(x, y - 0.5); on = true; } else if (dry) g.lineTo(x, y - 0.5); else on = false; }
+      g.stroke();
+    }
+    // the break: the shelf runs on for ~30 m before it drops into the channel (not to scale)
+    {
+      const yb = bedY(this.xBreak - 1e-6);
+      g.strokeStyle = dark ? 'rgba(220,225,230,.45)' : 'rgba(255,255,255,.7)'; g.lineWidth = 1.3;
+      g.beginPath(); g.moveTo(xB, yb - 12);
+      for (let k = 1; k <= 6; k++) g.lineTo(xB + (k % 2 ? 4 : -4), yb - 12 + k * 6);
+      g.stroke();
+      g.fillStyle = dark ? 'rgba(220,225,230,.55)' : 'rgba(255,255,255,.8)'; g.font = `600 ${Math.max(10, Math.round(this.S * 0.22))}px system-ui, sans-serif`;
+      g.fillText('≈30 m', xB - 14, yb + 40);
+    }
     // behind the section: the sloping apron of round boulders set in concrete that the steps cut through
     const st0 = gb.steps[0], stN = gb.steps[gb.steps.length - 1];
     const nose = (k) => [this.xM(gb.steps[k].x0), this.yZ(gb.steps[k].z0)];
@@ -237,51 +283,76 @@ export class Hero {
     g.lineWidth = 1.4;
     for (const k of [0, Math.floor(gb.steps.length / 2), gb.steps.length - 1]) { const st = gb.steps[k]; g.beginPath(); g.moveTo(this.xM(st.x0) + 3, this.yZ(st.z0)); g.lineTo(this.xM(st.x0) + 3, railY(st) - 1); g.stroke(); }
     // person on the bed just past the foot of the steps (or swimming, when it's out of their depth)
-    const dHere = Math.max(0, zw - gb.bedBest);
-    const px = this.xM(gb.footX + 1.0), ph = s.personH * this.S, pyFeet = bedY(gb.footX + 1.0);
-    if (dHere > 0.86 * s.personH) this.drawSwimmer(px, yS, ph, dark); else this.drawPerson(px, pyFeet, ph, dark);
-    // the water body in the cut
+    const pxm = gb.footX + 0.8;
+    const zPerson = this.bedZ(pxm);
+    const dHere = Math.max(0, zw - zPerson);
+    const px = this.xM(pxm), ph = s.personH * this.S, pyFeet = this.yZ(zPerson);
+    const swimmer = dHere > 0.86 * s.personH;
+    if (swimmer) this.drawSwimmer(px, yS, ph, dark); else this.drawPerson(px, pyFeet, ph, dark);
+    // the water body in the cut, at the computed level: against the steps when it is up to them,
+    // otherwise out over the foreshore wherever the bed is below it
     const amp = s.chop ? clamp(s.chop.Hs / 2, 0, 0.35) * this.S : 0;
     const wl = this.waveLen() * this.S;
-    if (zw > gb.bedBest - 0.02) {
-      const wg = g.createLinearGradient(0, yS, 0, this.yZ(gb.bedBest));
-      wg.addColorStop(0, dark ? 'rgba(18,52,70,.72)' : 'rgba(40,120,140,.62)');
-      wg.addColorStop(1, dark ? 'rgba(6,22,32,.85)' : 'rgba(14,62,80,.8)');
+    const surf = (x) => yS + amp * Math.sin((x / wl) * 2 * Math.PI - this.phase * 2 * Math.PI) * 0.9 + amp * 0.35 * Math.sin((x / (wl * 0.53)) * 2 * Math.PI + this.phase * 5.1);
+    const xs = this.waterLeftX(zw);
+    const atSteps = zw >= gb.bedBest;
+    if (xs < W) {
+      const wg = g.createLinearGradient(0, yS, 0, Math.max(yS + 1, this.yBot));
+      wg.addColorStop(0, dark ? 'rgba(30,84,110,.84)' : 'rgba(40,120,140,.8)');
+      wg.addColorStop(1, dark ? 'rgba(8,30,44,.88)' : 'rgba(14,62,80,.82)');
       g.fillStyle = wg;
       g.beginPath();
-      const xs = this.wallX(zw);
       g.moveTo(xs, yS);
-      for (let x = xs; x <= W; x += 3) g.lineTo(x, yS + amp * Math.sin((x / wl) * 2 * Math.PI - this.phase * 2 * Math.PI) * 0.9 + amp * 0.35 * Math.sin((x / (wl * 0.53)) * 2 * Math.PI + this.phase * 5.1));
-      // down the right edge to the bed, back along the bed to the foot of the steps
-      for (let x = W; x >= xFoot; x -= 6) g.lineTo(x, bedY((x - this.x0) / this.S));
-      g.lineTo(xFoot, this.yZ(gb.bedBest));
-      // follow the steps back up to the waterline
-      for (let k = gb.steps.length - 1; k >= 0; k--) { const st = gb.steps[k]; if (st.z1 < zw) { g.lineTo(this.xM(st.x1), this.yZ(Math.max(st.z1, gb.bedBest))); g.lineTo(this.xM(st.x0), this.yZ(st.z1)); } }
+      for (let x = xs; x <= W; x += 3) g.lineTo(x, surf(x));
+      g.lineTo(xR, surf(xR));
+      // down the right edge to the bed, back along the bed towards the steps
+      for (let k = bedPts.length - 1; k >= 0; k--) { const [x, y] = bedPts[k]; if (x < xs) break; g.lineTo(x, y); }
+      if (atSteps) {
+        g.lineTo(xFoot, this.yZ(gb.bedBest));
+        // follow the steps back up to the waterline
+        for (let k = gb.steps.length - 1; k >= 0; k--) { const st = gb.steps[k]; if (st.z1 < zw) { g.lineTo(this.xM(st.x1), this.yZ(Math.max(st.z1, gb.bedBest))); g.lineTo(this.xM(st.x0), this.yZ(st.z1)); } }
+      } else g.lineTo(xs, yS);
       g.closePath(); g.fill();
       // surface line
-      g.strokeStyle = dark ? 'rgba(170,210,230,.55)' : 'rgba(235,250,255,.9)'; g.lineWidth = 1.6;
+      g.strokeStyle = dark ? 'rgba(190,225,240,.8)' : 'rgba(235,250,255,.95)'; g.lineWidth = 1.8;
       g.beginPath();
-      for (let x = xs; x <= W; x += 3) { const y = yS + amp * Math.sin((x / wl) * 2 * Math.PI - this.phase * 2 * Math.PI) * 0.9 + amp * 0.35 * Math.sin((x / (wl * 0.53)) * 2 * Math.PI + this.phase * 5.1); x === xs ? g.moveTo(x, y) : g.lineTo(x, y); }
+      for (let x = xs; x <= W; x += 3) { const y = surf(x); x === xs ? g.moveTo(x, y) : g.lineTo(x, y); }
+      g.lineTo(xR, surf(xR));
       g.stroke();
     }
     // time travel: today's water level at this moment, dashed, for comparison
     if (s.ghost != null && Math.abs(s.ghost - zw) > 0.02) {
-      const yG = this.yZ(s.ghost), xg = this.wallX(Math.max(s.ghost, gb.bedBest));
+      const yG = this.yZ(s.ghost), xg = Math.min(W - 40, this.waterLeftX(s.ghost));
       g.save(); g.setLineDash([6, 5]); g.strokeStyle = dark ? 'rgba(255,255,255,.55)' : 'rgba(20,40,50,.6)'; g.lineWidth = 1.5;
       g.beginPath(); g.moveTo(xg, yG); g.lineTo(W, yG); g.stroke(); g.restore();
-      g.fillStyle = dark ? 'rgba(255,255,255,.75)' : 'rgba(20,40,50,.8)'; g.font = '600 11px system-ui, sans-serif';
-      g.fillText(s.ghostLabel || 'today', Math.min(W - 60, xg + 8), yG - 5);
+      g.fillStyle = dark ? 'rgba(255,255,255,.75)' : 'rgba(255,255,255,.85)'; g.font = `600 ${Math.max(11, Math.round(this.S * 0.24))}px system-ui, sans-serif`;
+      const gt = s.ghostLabel || 'today', gw = g.measureText(gt).width;
+      g.fillText(gt, Math.max(xg + 4, W - gw - 8), yG + (s.ghost < zw ? 14 : -5));
     }
-    // depth tape at the foot of the steps
-    const d = Math.max(0, zw - gb.bedBest);
+    // depth tape at the foot of the steps: up from the foot to the water, or, when the water is
+    // short of the steps, down from the foot to the level, dashed out to where the water starts
+    const dRaw = zw - gb.bedBest, d = Math.max(0, dRaw);
     const tx = xFoot + 6, ty0 = this.yZ(gb.bedBest);
     g.strokeStyle = 'rgba(255,255,255,.85)'; g.lineWidth = 2;
-    g.beginPath(); g.moveTo(tx, ty0); g.lineTo(tx, ty0 - d * this.S); g.stroke();
-    g.fillStyle = 'rgba(255,255,255,.85)';
-    for (let m = 0.5; m < d; m += 0.5) g.fillRect(tx - 4, ty0 - m * this.S - 0.5, 8, 1.5);
+    if (dRaw >= 0) {
+      g.beginPath(); g.moveTo(tx, ty0); g.lineTo(tx, ty0 - d * this.S); g.stroke();
+      g.fillStyle = 'rgba(255,255,255,.85)';
+      for (let m = 0.5; m < d; m += 0.5) g.fillRect(tx - 4, ty0 - m * this.S - 0.5, 8, 1.5);
+    } else {
+      g.save(); g.lineWidth = 1.2; g.strokeStyle = 'rgba(255,255,255,.6)'; g.setLineDash([3, 4]);
+      g.beginPath(); g.moveTo(xFoot, yS); g.lineTo(Math.min(W, xs), yS); g.stroke(); g.restore();
+      g.beginPath(); g.moveTo(tx, ty0); g.lineTo(tx, yS); g.moveTo(tx - 4, ty0); g.lineTo(tx + 4, ty0); g.moveTo(tx - 4, yS); g.lineTo(tx + 4, yS); g.stroke();
+      g.fillStyle = 'rgba(255,255,255,.9)'; g.font = `600 ${Math.max(11, Math.round(this.S * 0.24))}px system-ui, sans-serif`;
+      const gap = -dRaw < 0.3 ? `${Math.round(-dRaw * 100)} cm` : `${(Math.round(-dRaw * 10) / 10).toFixed(1)} m`; // as the verdict line words it
+      g.fillText(`${gap} below`, tx + 8, yS - ty0 < 30 ? yS + 14 : (ty0 + yS) / 2 + 4);
+    }
     // label position for the HTML overlay
     this.labelAt = { x: clamp(px + 30, 84, W - 84), y: Math.min(yS - 8, pyFeet - ph - 6) };
     this.depthWord = bodyWord(d, s.personH);
+    // what was drawn, in the drawing's own numbers (read by tools/hero_check.cjs)
+    this.lastDraw = { level: zw, yS, zAtYS: this.zY(yS), S: this.S, yH, yBand, yCut: this.yCut, yTopOfSteps: this.yZ(gb.top), yBot: this.yBot, H, W,
+      xWater: xs, xFoot, yFoot: ty0, atSteps, waterDrawn: xs < W, zPerson, dHere, personFeetY: pyFeet, personHeadY: swimmer ? yS - 0.17 * ph / 1.72 : pyFeet - ph, swimmer,
+      bareFromFoot: atSteps ? 0 : (Math.min(W, xs) - xFoot) / this.S };
   }
   wallX(z) { // x where the water meets the steps at level z
     const gb = this.geom;

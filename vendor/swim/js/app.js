@@ -44,7 +44,7 @@ async function main() {
   if (!LEVELS[state.chosen]) state.chosen = 'swim';
 
   // geometry of the cut for the hero (metres along the section, OD Malin)
-  const geom = buildGeometry(P);
+  const geom = buildGeometry(P, model);
   const hero = new Hero($('#heroCanvas'), skyline, geom);
 
   // windows are computed once per depth threshold for the whole period the page can show
@@ -69,17 +69,17 @@ async function main() {
     const slope = pt.level(t + 5 * 60000) - pt.level(t - 5 * 60000);
     const trend = Math.abs(slope) < 0.006 ? 'about at the turn' : slope > 0 ? 'rising' : 'falling';
     const ex = pt.extremes(t, t + 14 * 3600000)[0];
-    const word = d >= LEVELS.swim ? 'Swim' : d >= LEVELS.dip ? 'Dip' : d >= LEVELS.wade ? 'Wade' : dRaw > 0.05 ? 'Paddle' : dRaw > -0.3 ? 'Water\u2019s edge' : 'Dry';
+    const word = verdictWord(dRaw);
     $('#verdict').textContent = word;
     const live = Math.abs(t - state.now) < 4 * 60000;
     $('#when').textContent = NOW.fixed
       ? `${live ? 'Set to' : 'Scrubbed to'} ${dateLabel(t)} ${hm(t)}`
       : `${live ? 'Now, ' : ''}${cap(dayName(t, state.now, true))} ${hm(t)}${live ? '' : ' (scrubbed)'}`;
     let line;
-    if (dRaw > -0.3 && dRaw <= 0.05) {
+    if (word === 'Water\u2019s edge') {
       line = `The tide is right around the foot of the steps (${dRaw >= 0 ? 'a few centimetres up' : `about ${Math.round(-dRaw * 100)} cm short`}), which is closer than this page can call it.`;
-    } else if (d <= 0.02) {
-      const back = winsFor(0.05).find((w) => w.start > t);
+    } else if (word === 'Dry') {
+      const back = (off ? windows({ depth: (u) => pt.depth(u) + off }, t, state.now + 17 * 86400000, EDGE_HI) : winsFor(EDGE_HI)).find((w) => w.start > t);
       const bd = back ? dayName(back.start, t) : null;
       line = `The water is ${m1(P.bed.best - lev)} m below the foot of the steps.`;
       if (back) line += back.start - t < 20 * 3600000 ? ` It's back at the steps around ${hm(back.start)}.` : ` The tide won't reach the steps again until ${bd === 'tomorrow' ? 'tomorrow' : bd} around ${hm(back.start)}.`;
@@ -107,12 +107,14 @@ async function main() {
     // label at the person
     const gl = $('#gaugeLabel');
     if (hero.labelAt) {
-      gl.textContent = d > 0.02 ? `${bodyWord(d, PERSON_H)} · ${m1(d)} m` : 'dry at the steps';
+      gl.textContent = figureLabel(dRaw);
       const half = (gl.offsetWidth || 150) / 2, Wh = $('#hero').clientWidth;
       gl.style.left = Math.max(half + 6, Math.min(Wh - half - 6, hero.labelAt.x)) + 'px'; gl.style.top = hero.labelAt.y + 'px';
     }
     $('#scrubOut').textContent = hm(t);
     $('#nowBtn').hidden = live;
+    // for tools/hero_check.cjs: the numbers behind this frame, and what the hero drew
+    window.__swimHero = { t, today, off, lev, dRaw, d, word, line, label: gl.textContent, draw: hero.lastDraw };
   }
   function nextLine(t) {
     const need = LEVELS[state.chosen], name = state.chosen;
@@ -183,7 +185,8 @@ async function main() {
   function maxDepth(a, b) { let m = 0; for (let t = a; t <= b; t += 5 * 60000) m = Math.max(m, pt.depth(t)); return m; }
   function readout(t) {
     const d = pt.depth(t), lev = pt.level(t);
-    $('#readout').innerHTML = `<b>${esc(cap(dayName(t, state.now)))} ${hm(t)}</b>: ${d > 0.02 ? `${m1(d)} m at the foot of the steps (${esc(bodyWord(d, PERSON_H))})` : 'dry at the foot of the steps'}. Water level ${lev >= 0 ? '+' : '−'}${Math.abs(lev).toFixed(2)} m OD Malin.`;
+    const w = verdictWord(d);
+    $('#readout').innerHTML = `<b>${esc(cap(dayName(t, state.now)))} ${hm(t)}</b>: ${w === 'Dry' ? `dry, the water ${m1(-d)} m below the foot of the steps` : w === 'Water\u2019s edge' ? 'the water\u2019s edge, right around the foot of the steps' : `${m1(d)} m at the foot of the steps (${esc(bodyWord(d, PERSON_H))})`}. Water level ${lev >= 0 ? '+' : '−'}${Math.abs(lev).toFixed(2)} m OD Malin.`;
   }
 
   // ---------- springs and neaps strip ----------
@@ -439,14 +442,37 @@ async function main() {
 function distKm(a, b) { const kx = 111.32 * Math.cos(a.lat * Math.PI / 180); return Math.hypot((a.lon - b.lon) * kx, (a.lat - b.lat) * 110.54); }
 const cap = (s) => String(s).charAt(0).toUpperCase() + String(s).slice(1);
 
+// The verdict from the water level minus the foot of the steps (dRaw, m; negative = short of the steps).
+// Dry below -0.3 m; Water's edge from -0.3 to +0.05 m (inside the +/-0.25 m the bed is known to);
+// Paddle up to 0.3 m; Wade from 0.3 m; Dip from 0.7 m; Swim from 1.0 m. Each band starts where the last ends.
+const EDGE_LO = -0.3, EDGE_HI = 0.05;
+function verdictWord(dRaw) {
+  if (dRaw >= LEVELS.swim) return 'Swim';
+  if (dRaw >= LEVELS.dip) return 'Dip';
+  if (dRaw >= LEVELS.wade) return 'Wade';
+  if (dRaw > EDGE_HI) return 'Paddle';
+  if (dRaw > EDGE_LO) return 'Water\u2019s edge';
+  return 'Dry';
+}
+// the label on the figure: the same bands as the verdict, in body words
+function figureLabel(dRaw) {
+  const w = verdictWord(dRaw);
+  if (w === 'Dry') return `dry · water ${m1(-dRaw)} m below`;
+  if (w === 'Water\u2019s edge') return dRaw >= 0 ? 'water\u2019s edge · at the foot' : `water\u2019s edge · ${Math.round(-dRaw * 100)} cm short`;
+  return `${bodyWord(dRaw, PERSON_H)} · ${m1(dRaw)} m`;
+}
+
 // metres along the section; steps from the promenade to the foot, then the foreshore
-function buildGeometry(P) {
+function buildGeometry(P, model) {
   const s = P.steps;
   const steps = [];
   let x = s.start_x, z = P.top;
   const n = s.count, rise = (P.top - s.bottom) / n;
   for (let k = 0; k < n; k++) { steps.push({ x0: x, x1: x + s.tread, z0: z, z1: z - rise }); x += s.tread; z -= rise; }
-  return { top: P.top, steps, footX: x, bedBest: P.bed.best, bedSlope: P.bed.slope, flats: P.flats_odm, bayBed: P.bay_bed_odm ?? -1.1, shelterX: -0.35 };
+  // the hero's window reaches 0.1 m below the lowest astronomical tide at the Point (2026-44),
+  // so every level the tide can reach is drawn in the frame
+  const lat = model.levels.min_2026_2044 - model.Z0 + P.msl_odm + Math.min(0, P.diffs.mlws);
+  return { top: P.top, steps, footX: x, bedBest: P.bed.best, bedSlope: P.bed.slope, shelfLen: 30, zLow: Math.floor((lat - 0.1) * 10) / 10, shelterX: -0.35 };
 }
 
 function fillNumbers(model, P) {
